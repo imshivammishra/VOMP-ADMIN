@@ -26,7 +26,7 @@ export default function LoginPage() {
       const message =
         reason instanceof ApiError
           ? reason.message
-          : "Could not reach the API application. Check that it is running on port 8081.";
+          : "Could not reach the API service. Please try again in a moment.";
       setError(message);
     } finally {
       setBusy(false);

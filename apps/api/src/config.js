@@ -1,3 +1,4 @@
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import "dotenv/config";
@@ -42,13 +43,25 @@ if (isProd) {
   }
 }
 
+// Development is often opened through the machine's LAN address or a preview
+// host. Include local interface addresses on the three app ports so CORS keeps
+// working without editing .env for every network change. Production remains
+// restricted to the explicit origins below.
+const localHosts = new Set(["localhost", "127.0.0.1", os.hostname()]);
+if (!isProd) {
+  for (const entries of Object.values(os.networkInterfaces())) {
+    for (const entry of entries || []) {
+      if (entry.family === "IPv4" && !entry.internal) localHosts.add(entry.address);
+    }
+  }
+}
 const localOrigins = [
   frontendUrl,
   adminUrl,
   apiPublicUrl,
-  "http://localhost:3000",
-  "http://localhost:3001",
-  "http://localhost:3002",
+  ...[...localHosts].flatMap((host) =>
+    [3000, 3001, 3002].map((port) => `http://${host}:${port}`)
+  ),
 ];
 
 const productionOrigins = [frontendUrl, adminUrl, apiPublicUrl];

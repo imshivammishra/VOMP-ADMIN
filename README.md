@@ -4,22 +4,23 @@ Production monorepo for the private side of **Venue On My Plate**: the public
 content API, the operations console and one SQL database. The customer website
 lives in the separate [`VENUEONMYPLATE`](../VENUEONMYPLATE) repository.
 
-| Service | Local URL | Production |
-| --- | --- | --- |
-| Public website | <http://localhost:3001> | <https://venueonmyplate.in> |
-| Admin console | <http://localhost:3002> | <https://admin.venueonmyplate.in> |
-| API | <http://localhost:8081> | private `127.0.0.1:8081` behind Nginx |
+| Service | Local URL | Development / staging | Production |
+| --- | --- | --- | --- |
+| Public website | <http://localhost:3001> | <https://dev.venueonmyplate.com> | <https://venueonmyplate.in> |
+| Admin console | <http://localhost:3002> | <https://dev-admin.venueonmyplate.com> | <https://admin.venueonmyplate.in> |
+| API | <http://localhost:8081> | <https://dev.api.venueonmyplate.com> | private behind Nginx |
 
 ## Architecture
 
 ```text
 Internet
    │
-   ├── venueonmyplate.in        → Nginx → Next website      127.0.0.1:3000
-   └── admin.venueonmyplate.in  → Nginx → Next admin        127.0.0.1:3002
-                                         └→ /api/*         Express 127.0.0.1:8081
-                                         └→ /uploads/*     shared media storage
+   ├── dev.venueonmyplate.com        → Nginx → Next website   127.0.0.1:3000
+   ├── dev-admin.venueonmyplate.com  → Nginx → Next admin     127.0.0.1:3002
+   └── dev.api.venueonmyplate.com    → Nginx → Express API    127.0.0.1:8081
 
+The website/admin call /api on their own origin, so the admin session cookie
+stays first-party. /uploads is served from shared media storage.
 API/admin/website are separate processes. Nginx is the only public entry point.
 Database: SQLite in WAL mode, stored outside both repositories on the VPS.
 ```
@@ -117,8 +118,10 @@ CSRF checks and login rate limiting.
 Never commit `.env` files. Production secrets live in
 `/var/www/vomp/shared/env/` with mode `600`.
 
-In production the admin and website both call `/api` on their own origin, so the
-session remains first-party. The API itself is bound to loopback only.
+The admin and website both call `/api` on their own origin, so the session
+remains first-party. Next.js proxies that path to the private API in local
+development; Nginx proxies it in production. The API itself is bound to
+loopback only.
 
 ## Data and media
 
@@ -164,15 +167,14 @@ Successful API payloads use `{ "data": ... }`; list responses add `meta`.
 
 ## GitHub workflow
 
-This repository is CI-ready. Recommended flow:
+The workspace is published at
+[`imshivammishra/VOMP-ADMIN`](https://github.com/imshivammishra/VOMP-ADMIN).
+`main` is protected by CI:
 
 ```bash
-git init
-git branch -M main
 git add .
-git commit -m "Production workspace"
-git remote add origin git@github.com:<owner>/venue-workspace.git
-git push -u origin main
+git commit -m "Describe the change"
+git push origin main
 ```
 
 The website repository has its own CI and remote. CI verifies the API boot/login

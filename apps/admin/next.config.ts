@@ -39,7 +39,12 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   experimental: { optimizePackageImports: ["lucide-react", "recharts"] },
   async rewrites() {
-    return [{ source: "/uploads/:path*", destination: `${apiInternal}/uploads/:path*` }];
+    return [
+      // Local development and previews use the admin origin for API calls.
+      // In production Nginx proxies /api and /uploads before Next.js.
+      { source: "/api/:path*", destination: `${apiInternal}/api/:path*` },
+      { source: "/uploads/:path*", destination: `${apiInternal}/uploads/:path*` },
+    ];
   },
   async headers() {
     return [

@@ -5,18 +5,23 @@
 ```text
 Browser
   │
-  ├─ https://venueonmyplate.in ────── Nginx ── Next website  :3000
-  │                                      ├── /uploads/* ── shared uploads
-  │                                      └── /api/* ────── Express :8081
+  ├─ https://dev.venueonmyplate.com ────── Nginx ── Next website  :3000
+  │                                           ├── /uploads/* ── shared uploads
+  │                                           └── /api/* ────── Express :8081
   │
-  └─ https://admin.venueonmyplate.in ─ Nginx ── Next admin   :3002
-                                         ├── /uploads/* ── shared uploads
-                                         └── /api/* ────── Express :8081
+  ├─ https://dev-admin.venueonmyplate.com ─ Nginx ── Next admin   :3002
+  │                                           ├── /uploads/* ── shared uploads
+  │                                           └── /api/* ────── Express :8081
+  │
+  └─ https://dev.api.venueonmyplate.com ── Nginx ── Express API   :8081
 ```
 
-The API listens only on loopback. Both Next applications use same-origin `/api`
-paths in production, so admin session cookies are first-party and no public CORS
-surface is required. The API still validates `Origin`/`Host` for writes.
+The API listens only on loopback; Nginx proxies every public hostname. Both Next
+applications use same-origin `/api` paths, so admin session cookies are
+first-party. The API still validates `Origin`/`Host` for writes and applies CORS
+for the website/admin origins. The production profile uses
+`venueonmyplate.in` and `admin.venueonmyplate.in` with the same same-origin API
+strategy and no public API hostname.
 
 ## Monorepo boundaries
 
