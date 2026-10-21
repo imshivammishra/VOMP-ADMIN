@@ -1,0 +1,28 @@
+{
+  "name": "venue-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Venue On My Plate — production monorepo for the API and operations console",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -n api,admin -c magenta,cyan \"npm run dev --workspace @vomp/api\" \"npm run dev --workspace @vomp/admin\"",
+    "dev:api": "npm run dev --workspace @vomp/api",
+    "dev:admin": "npm run dev --workspace @vomp/admin",
+    "seed": "npm run seed --workspace @vomp/api",
+    "build": "npm run build --workspace @vomp/admin",
+    "typecheck": "npm run typecheck --workspace @vomp/admin",
+    "lint": "npm run lint --workspace @vomp/admin",
+    "start": "concurrently -k -n api,admin -c magenta,cyan \"npm run start --workspace @vomp/api\" \"npm run start --workspace @vomp/admin\"",
+    "check": "npm run check --workspace @vomp/api && npm run lint --workspace @vomp/admin && npm run typecheck --workspace @vomp/admin && npm run build --workspace @vomp/admin",
+    "test": "npm run check --workspace @vomp/api && npm run smoke --workspace @vomp/api"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "engines": {
+    "node": ">=22.5.0",
+    "npm": ">=10.0.0"
+  }
+}

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Venue On My Plate">
+  <rect width="64" height="64" rx="12" fill="#0a0a0a"/>
+  <rect x="7.5" y="7.5" width="49" height="49" rx="7" fill="none" stroke="#ffffff" stroke-opacity="0.22"/>
+  <path d="M20 20.5 32 43.5 44 20.5" fill="none" stroke="#ffffff" stroke-width="4.2" stroke-linecap="square" stroke-linejoin="miter"/>
+</svg>
