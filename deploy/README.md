@@ -171,6 +171,10 @@ three public origins, and generates a strong first admin password.
 
 **Copy the printed password now. It is only printed once.**
 
+If env files already exist, the script keeps them unchanged. To switch domain
+profiles later, back up and remove those three files, then rerun `init-env.sh`;
+the database and uploaded media are not touched.
+
 Review the admin email and other values:
 
 ```bash
