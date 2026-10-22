@@ -126,10 +126,10 @@ export const contentBlocks = [
   { section: "gallery", title: "Open-air mandaps", image: "/images/wedding-dance.jpg", imageAlt: "White canopy mandap in daylight", meta: {} },
 
   // ── Films ──────────────────────────────────────────────────────────────
-  { section: "film", title: "Haldi mornings", image: "/videos/hero-bg.mp4", imageAlt: "Haldi morning celebration", meta: {} },
-  { section: "film", title: "Floral details", image: "/images/indian-ceremony.jpg", imageAlt: "Floral wedding details", meta: {} },
-  { section: "film", title: "First looks", image: "/images/wedding-decor.jpg", imageAlt: "First look moment", meta: {} },
-  { section: "film", title: "Aisle walks", image: "/images/wedding-dance.jpg", imageAlt: "Aisle walk at a wedding", meta: {} },
+  { section: "film", title: "Haldi mornings", image: "/videos/hero-bg.mp4", imageAlt: "Haldi morning celebration", meta: { startAt: "0", poster: "/images/indian-ceremony.jpg" } },
+  { section: "film", title: "Floral details", image: "/videos/hero-bg.mp4", imageAlt: "Floral wedding details", meta: { startAt: "7", poster: "/images/wedding-decor.jpg" } },
+  { section: "film", title: "First looks", image: "/videos/hero-bg.mp4", imageAlt: "First look moment", meta: { startAt: "14", poster: "/images/wedding-decor.jpg" } },
+  { section: "film", title: "Aisle walks", image: "/videos/hero-bg.mp4", imageAlt: "Aisle walk at a wedding", meta: { startAt: "21", poster: "/images/wedding-dance.jpg" } },
 
   // ── FAQs ───────────────────────────────────────────────────────────────
   { section: "faq", title: "What does Venue On My Plate do?", body: "We help you discover venues and shortlist the right ones for your date, guest count and budget. Share your requirements once and our team responds with curated options and proposal assistance.", meta: {} },
