@@ -126,9 +126,9 @@ export const contentBlocks = [
   { section: "gallery", title: "Open-air mandaps", image: "/images/wedding-dance.jpg", imageAlt: "White canopy mandap in daylight", meta: {} },
 
   // ── Films ──────────────────────────────────────────────────────────────
-  { section: "film", title: "Haldi mornings", image: "/videos/hero-bg.mp4", imageAlt: "Haldi morning celebration", meta: { startAt: "0", poster: "/images/indian-ceremony.jpg" } },
-  { section: "film", title: "Floral details", image: "/videos/hero-bg.mp4", imageAlt: "Floral wedding details", meta: { startAt: "7", poster: "/images/wedding-decor.jpg" } },
-  { section: "film", title: "First looks", image: "/videos/hero-bg.mp4", imageAlt: "First look moment", meta: { startAt: "14", poster: "/images/wedding-decor.jpg" } },
+  { section: "film", title: "Haldi mornings", image: "/videos/film-haldi.mp4", imageAlt: "Haldi morning celebration", meta: { startAt: "0", poster: "/images/indian-ceremony.jpg" } },
+  { section: "film", title: "Floral details", image: "/videos/film-floral.mp4", imageAlt: "Floral wedding details", meta: { startAt: "0", poster: "/images/wedding-decor.jpg" } },
+  { section: "film", title: "First looks", image: "/videos/film-first-look.mp4", imageAlt: "First look moment", meta: { startAt: "0", poster: "/images/wedding-dance.jpg" } },
   { section: "film", title: "Aisle walks", image: "/videos/hero-bg.mp4", imageAlt: "Aisle walk at a wedding", meta: { startAt: "21", poster: "/images/wedding-dance.jpg" } },
 
   // ── FAQs ───────────────────────────────────────────────────────────────
