@@ -48,13 +48,13 @@ export const contentBlocks = [
     title: "/videos/hero-bg.mp4",
     subtitle: "",
     body: "",
-    image: "https://images.pexels.com/photos/38951530/pexels-photo-38951530.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    image: "/images/indian-ceremony.jpg",
     imageAlt: "Wedding venue highlights video",
     meta: {},
   },
-  slide("slide-1", "Venue On My Plate", "A venue as unforgettable as your love story.", "Palaces, lakefront estates and private resorts — curated for families who expect every detail to feel considered.", "https://images.pexels.com/photos/38951530/pexels-photo-38951530.jpeg?auto=compress&cs=tinysrgb&w=1600", "White floral wedding stage on a green lawn", "Explore venues", "/venues", "Get a private quote", "/contact"),
+  slide("slide-1", "Venue On My Plate", "A venue as unforgettable as your love story.", "Palaces, lakefront estates and private resorts — curated for families who expect every detail to feel considered.", "/images/indian-ceremony.jpg", "White floral wedding stage on a green lawn", "Explore venues", "/venues", "Get a private quote", "/contact"),
   slide("slide-2", "Udaipur · Jaipur · Goa", "Destination weddings without the drama.", "From City Palace sunsets to barefoot luxury in Goa — compare ambience, privacy, rooms and service fit before you visit.", "/images/udaipur-city.jpg", "Lake Palace in Udaipur", "View destinations", "/cities", "Get a private quote", "/contact"),
-  slide("slide-3", "Shortlist in a day", "Your dream shortlist, in one day flat.", "Share your city, date, guest count and mood. Receive a bespoke shortlist with private quote-led options in one business day.", "https://images.pexels.com/photos/32854443/pexels-photo-32854443.jpeg?auto=compress&cs=tinysrgb&w=1600", "White draped wedding mandap with crystal chandelier", "How it works", "#how-it-works", "Talk to an expert", "/contact"),
+  slide("slide-3", "Shortlist in a day", "Your dream shortlist, in one day flat.", "Share your city, date, guest count and mood. Receive a bespoke shortlist with private quote-led options in one business day.", "/images/wedding-decor.jpg", "White draped wedding mandap with crystal chandelier", "How it works", "#how-it-works", "Talk to an expert", "/contact"),
 
   // ── Ticker ─────────────────────────────────────────────────────────────
   ...["Udaipur", "Jaipur", "Goa", "Delhi NCR", "Mumbai", "Weddings", "Sangeet", "Haldi", "Receptions", "Corporate"].map((title) => ({
@@ -72,7 +72,7 @@ export const contentBlocks = [
     title: "Luxury venue access shaped around your family",
     subtitle: "About us",
     body: "Venue On My Plate brings private venue intelligence, high-touch shortlisting, and discreet proposal support for weddings and landmark celebrations that deserve more than a generic listing page.",
-    image: "https://images.pexels.com/photos/35985196/pexels-photo-35985196.jpeg?auto=compress&cs=tinysrgb&w=1100",
+    image: "/images/wedding-decor.jpg",
     imageAlt: "Bright white wedding reception tablescape",
     linkLabel: "More about us",
     linkHref: "/about",
@@ -94,7 +94,7 @@ export const contentBlocks = [
     title: "Drapes, blooms and morning light.",
     subtitle: "Signature stages",
     body: "",
-    image: "https://videos.pexels.com/video-files/20697239/20697239-hd_1280_720_25fps.mp4",
+    image: "/videos/hero-bg.mp4",
     imageAlt: "Wedding stage details",
     linkLabel: "Explore venues",
     linkHref: "/venues",
@@ -120,16 +120,16 @@ export const contentBlocks = [
   { section: "step", subtitle: "03", title: "Confirm next steps by call", body: "Plan visits, compare private quote options, and continue with a human-assisted enquiry.", meta: {} },
 
   // ── Gallery ────────────────────────────────────────────────────────────
-  { section: "gallery", title: "Grand celebrations", image: "https://images.pexels.com/photos/35985256/pexels-photo-35985256.jpeg?auto=compress&cs=tinysrgb&w=900", imageAlt: "White floral decoration with golden table outdoors", meta: {} },
-  { section: "gallery", title: "Palace weddings", image: "https://images.pexels.com/photos/38254676/pexels-photo-38254676.jpeg?auto=compress&cs=tinysrgb&w=900", imageAlt: "Cream wedding mandap with marigold hangings", meta: {} },
-  { section: "gallery", title: "Floral tablescapes", image: "https://images.pexels.com/photos/32476128/pexels-photo-32476128.jpeg?auto=compress&cs=tinysrgb&w=900", imageAlt: "White floral bouquets on a wedding table", meta: {} },
-  { section: "gallery", title: "Open-air mandaps", image: "https://images.pexels.com/photos/37828118/pexels-photo-37828118.jpeg?auto=compress&cs=tinysrgb&w=900", imageAlt: "White canopy mandap in daylight", meta: {} },
+  { section: "gallery", title: "Grand celebrations", image: "/images/indian-ceremony.jpg", imageAlt: "White floral decoration with golden table outdoors", meta: {} },
+  { section: "gallery", title: "Palace weddings", image: "/images/udaipur-palace2.jpg", imageAlt: "Cream wedding mandap with marigold hangings", meta: {} },
+  { section: "gallery", title: "Floral tablescapes", image: "/images/wedding-decor.jpg", imageAlt: "White floral bouquets on a wedding table", meta: {} },
+  { section: "gallery", title: "Open-air mandaps", image: "/images/wedding-dance.jpg", imageAlt: "White canopy mandap in daylight", meta: {} },
 
   // ── Films ──────────────────────────────────────────────────────────────
-  { section: "film", title: "Haldi mornings", image: "https://videos.pexels.com/video-files/35067978/14854574_960_540_50fps.mp4", imageAlt: "Haldi morning celebration", meta: {} },
-  { section: "film", title: "Floral details", image: "https://videos.pexels.com/video-files/35222217/14921664_960_540_50fps.mp4", imageAlt: "Floral wedding details", meta: {} },
-  { section: "film", title: "First looks", image: "https://videos.pexels.com/video-files/34519848/14625946_960_540_24fps.mp4", imageAlt: "First look moment", meta: {} },
-  { section: "film", title: "Aisle walks", image: "https://videos.pexels.com/video-files/27979648/12279918_960_540_25fps.mp4", imageAlt: "Aisle walk at a wedding", meta: {} },
+  { section: "film", title: "Haldi mornings", image: "/videos/hero-bg.mp4", imageAlt: "Haldi morning celebration", meta: {} },
+  { section: "film", title: "Floral details", image: "/images/indian-ceremony.jpg", imageAlt: "Floral wedding details", meta: {} },
+  { section: "film", title: "First looks", image: "/images/wedding-decor.jpg", imageAlt: "First look moment", meta: {} },
+  { section: "film", title: "Aisle walks", image: "/images/wedding-dance.jpg", imageAlt: "Aisle walk at a wedding", meta: {} },
 
   // ── FAQs ───────────────────────────────────────────────────────────────
   { section: "faq", title: "What does Venue On My Plate do?", body: "We help you discover venues and shortlist the right ones for your date, guest count and budget. Share your requirements once and our team responds with curated options and proposal assistance.", meta: {} },

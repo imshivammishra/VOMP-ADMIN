@@ -28,7 +28,7 @@ export const cities = [
     description:
       "Jaipur pairs Rajput architecture with easy logistics — forts, garden resorts and city palaces that work for both intimate functions and 1000-guest baraats.",
     image:
-      "https://images.unsplash.com/photo-1599661046289-e31897846e41?q=80&w=1200&auto=format&fit=crop",
+      "/images/udaipur-palace2.jpg",
     imageAlt: "Amber Fort overlooking Jaipur",
     venueCountLabel: "Curated venue selection",
     popularTypes: ["Fort Venue", "Garden Resort", "City Palace", "Hotel"],
@@ -40,46 +40,43 @@ export const cities = [
     description:
       "Goa is for couples who want a relaxed, multi-day celebration — beach lawns, Portuguese villas and cliff-top resorts, best between October and March.",
     image:
-      "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?q=80&w=1200&auto=format&fit=crop",
+      "/images/hero-poster.jpg",
     imageAlt: "Palm-lined beach in Goa",
     venueCountLabel: "Curated venue selection",
     popularTypes: ["Beach Resort", "Private Villa", "Cliff-top Lawn", "Hotel"],
   },
   {
-    slug: "delhi-ncr",
-    name: "Delhi NCR",
-    tagline: "High-capacity venues that run on time.",
+    slug: "jaisalmer",
+    name: "Jaisalmer",
+    tagline: "Golden sandstone, desert forts and dune-side evenings.",
     description:
-      "Chattarpur estates, Manesar resorts and Lutyens hotels — Delhi NCR suits large guest lists and winter weddings.",
-    image:
-      "https://images.unsplash.com/photo-1587474260584-136574528ed5?q=80&w=1200&auto=format&fit=crop",
-    imageAlt: "India Gate in New Delhi",
+      "Jaisalmer pairs honey-coloured forts with desert resorts and open dune lawns. It suits winter weddings, intimate heritage stays and celebrations that want a dramatic golden-hour backdrop.",
+    image: "/images/udaipur-palace2.jpg",
+    imageAlt: "Golden sandstone fort and desert venue in Jaisalmer",
     venueCountLabel: "Curated venue selection",
-    popularTypes: ["Banquet", "Farmhouse Lawns", "Resort", "Hotel"],
+    popularTypes: ["Fort Palace", "Desert Resort", "Heritage Haveli", "Luxury Camp"],
   },
   {
-    slug: "mumbai",
-    name: "Mumbai",
-    tagline: "Ballrooms, rooftops and sea breeze.",
+    slug: "jodhpur",
+    name: "Jodhpur",
+    tagline: "Blue-city rooftops beneath Mehrangarh.",
     description:
-      "Mumbai venues skew indoor and vertical — ballrooms, rooftops and sea-facing hotels ideal for receptions and sangeets.",
-    image:
-      "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?q=80&w=1200&auto=format&fit=crop",
-    imageAlt: "Mumbai skyline at dusk",
+      "Jodhpur brings Mehrangarh views, blue-city rooftops and palace courtyards together. It is a strong choice for royal-themed weddings, mehendi lunches and intimate receptions.",
+    image: "/images/udaipur-palace2.jpg",
+    imageAlt: "Palace venue beneath Mehrangarh in Jodhpur",
     venueCountLabel: "Curated venue selection",
-    popularTypes: ["Ballroom", "Rooftop", "Hotel", "Waterfront"],
+    popularTypes: ["Palace", "Heritage Haveli", "Courtyard Venue", "Resort"],
   },
   {
-    slug: "bangalore",
-    name: "Bangalore",
-    tagline: "Garden weather, all year.",
+    slug: "sawai-madhopur",
+    name: "Sawai Madhopur",
+    tagline: "Jungle-edge resorts and royal Ranthambore.",
     description:
-      "Bangalore's estates and resorts suit outdoor functions through most of the year, with strong options for pre-wedding carnivals.",
-    image:
-      "https://images.unsplash.com/photo-1596176530529-78163a4f7af2?q=80&w=1200&auto=format&fit=crop",
-    imageAlt: "Green gardens in Bangalore",
+      "Sawai Madhopur combines Ranthambore wilderness with palace stays and nature-facing lawns. It works beautifully for multi-day celebrations where guests want a safari and a slower rhythm.",
+    image: "/images/hero-poster.jpg",
+    imageAlt: "Jungle resort and heritage venue near Ranthambore",
     venueCountLabel: "Curated venue selection",
-    popularTypes: ["Resort", "Garden", "Villa", "Hotel"],
+    popularTypes: ["Jungle Resort", "Heritage Palace", "Nature Lawn", "Luxury Camp"],
   },
 ];
 
