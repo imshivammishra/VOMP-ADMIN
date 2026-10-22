@@ -50,11 +50,11 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             <div
               key={item.id}
               role="status"
-              className="toast-in pointer-events-auto flex items-start gap-3 rounded-xl border border-black/5 bg-white p-3.5 shadow-[0_22px_60px_-20px_rgba(0,0,0,0.28)]"
+              className="toast-in pointer-events-auto flex items-start gap-3 border border-ink bg-white p-3.5"
             >
               <span
                 className={cn(
-                  "mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-full",
+                  "mt-0.5 grid h-8 w-8 shrink-0 place-items-center",
                   item.tone === "success" && "bg-neutral-900 text-white",
                   item.tone === "error" && "bg-neutral-100 text-neutral-700",
                   item.tone === "info" && "bg-neutral-100 text-neutral-700"
@@ -72,7 +72,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
                 type="button"
                 onClick={() => dismiss(item.id)}
                 aria-label="Dismiss notification"
-                className="grid h-7 w-7 shrink-0 place-items-center rounded-full text-[#737373] transition hover:bg-black/5 hover:text-[#0a0a0a]"
+                className="grid h-7 w-7 shrink-0 place-items-center text-[#737373] transition-colors hover:bg-black/5 hover:text-[#0a0a0a]"
               >
                 <X size={14} />
               </button>

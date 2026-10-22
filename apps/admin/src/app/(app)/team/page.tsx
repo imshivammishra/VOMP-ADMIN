@@ -43,12 +43,12 @@ const ROLE_INFO: Record<Role, { label: string; description: string; className: s
   editor: {
     label: "Editor",
     description: "Manage enquiries, conversations, catalogue and media.",
-    className: "bg-cream-soft text-[#5f574a] ring-[#a3a3a3]/30",
+    className: "bg-[#f7f7f7] text-[#525252] ring-[#a3a3a3]/30",
   },
   viewer: {
     label: "Viewer",
     description: "Read-only access to the workspace and reports.",
-    className: "bg-cream-soft text-muted ring-line",
+    className: "bg-[#f7f7f7] text-muted ring-line",
   },
 };
 
@@ -159,35 +159,35 @@ export default function TeamPage() {
 
       <div className="mb-4 grid gap-4 sm:grid-cols-3">
         <Card className="p-4">
-          <p className="text-[9px] font-bold tracking-[0.16em] text-[#5f574a] uppercase">Active seats</p>
-          <p className="font-display mt-1 text-[34px] leading-none font-semibold text-ink">{activeCount}<span className="ml-1 text-[15px] text-[#a79b88]">/ {meta?.seatLimit || 50}</span></p>
+          <p className="text-[9px] font-bold tracking-[0.16em] text-[#525252] uppercase">Active seats</p>
+          <p className="font-display mt-1 text-[34px] leading-none font-semibold text-ink">{activeCount}<span className="ml-1 text-[15px] text-[#a3a3a3]">/ {meta?.seatLimit || 50}</span></p>
           <p className="mt-1.5 text-[10.5px] text-muted">teammates with access</p>
         </Card>
         <Card className="p-4">
-          <p className="text-[9px] font-bold tracking-[0.16em] text-[#5f574a] uppercase">Admins</p>
+          <p className="text-[9px] font-bold tracking-[0.16em] text-[#525252] uppercase">Admins</p>
           <p className="font-display mt-1 text-[34px] leading-none font-semibold text-ink">{adminCount}</p>
           <p className="mt-1.5 text-[10.5px] text-muted">full workspace control</p>
         </Card>
         <Card className="p-4">
-          <p className="text-[9px] font-bold tracking-[0.16em] text-[#5f574a] uppercase">Workspace owner</p>
+          <p className="text-[9px] font-bold tracking-[0.16em] text-[#525252] uppercase">Workspace owner</p>
           <p className="mt-1 truncate text-[13px] font-semibold text-ink">{meta?.owner?.name || me?.name || "—"}</p>
           <p className="mt-1 truncate text-[10.5px] text-muted">{meta?.owner?.email || me?.email}</p>
         </Card>
       </div>
 
       {error && (
-        <Card className="mb-4 border-line-strong bg-cream-soft p-4">
+        <Card className="mb-4 border-line-strong bg-[#f7f7f7] p-4">
           <p className="text-[12px] font-semibold text-ink">Team management is limited to admins.</p>
           <p className="mt-1 text-[11px] text-muted">{error instanceof Error ? error.message : "You do not have permission to view this page."}</p>
         </Card>
       )}
 
-      {!data && !error && <div className="space-y-3">{[0, 1, 2].map((row) => <Skeleton key={row} className="h-20 rounded-xl" />)}</div>}
+      {!data && !error && <div className="space-y-3">{[0, 1, 2].map((row) => <Skeleton key={row} className="h-20 " />)}</div>}
 
       <div className="grid gap-4 xl:grid-cols-[1.6fr_1fr]">
         <Card className="overflow-hidden">
           <div className="border-b border-ink/6 px-5 py-4">
-            <p className="text-[9.5px] font-bold tracking-[0.18em] text-[#5f574a] uppercase">Workspace members</p>
+            <p className="text-[9.5px] font-bold tracking-[0.18em] text-[#525252] uppercase">Workspace members</p>
             <h2 className="font-display mt-0.5 text-[26px] leading-none font-semibold text-ink">People with access</h2>
           </div>
           <div className="divide-y divide-black/5">
@@ -199,7 +199,7 @@ export default function TeamPage() {
                   <div className="min-w-0 flex-1">
                     <p className="flex items-center gap-1.5 truncate text-[12.5px] font-semibold text-ink">
                       {member.name}
-                      {self && <Badge className="bg-cream-soft text-muted ring-ink/6">you</Badge>}
+                      {self && <Badge className="bg-[#f7f7f7] text-muted ring-ink/6">you</Badge>}
                     </p>
                     <p className="truncate text-[10.5px] text-muted">{member.email}</p>
                   </div>
@@ -217,7 +217,7 @@ export default function TeamPage() {
                     <option value="editor">Editor</option>
                     <option value="viewer">Viewer</option>
                   </Select>
-                  <Badge className={member.status === "active" ? "bg-ink text-white ring-ink" : "bg-cream-soft text-[#817665] ring-line"}>
+                  <Badge className={member.status === "active" ? "bg-ink text-white ring-ink" : "bg-[#f7f7f7] text-[#6b6b6b] ring-line"}>
                     {member.status}
                   </Badge>
                   <div className="flex items-center gap-0.5">
@@ -226,8 +226,8 @@ export default function TeamPage() {
                       disabled={self || busyId === member.id}
                       onClick={() => patchMember(member, { status: member.status === "active" ? "suspended" : "active" }, member.status === "active" ? "Access suspended" : "Access restored")}
                       className={cn(
-                        "grid h-7 w-7 place-items-center rounded-full transition disabled:opacity-30",
-                        member.status === "active" ? "text-[#a79b88] hover:bg-cream-soft hover:text-ink" : "text-[#a79b88] hover:bg-cream-soft hover:text-ink"
+                        "grid h-7 w-7 place-items-center  transition-colors disabled:opacity-30",
+                        member.status === "active" ? "text-[#a3a3a3] hover:bg-[#f7f7f7] hover:text-ink" : "text-[#a3a3a3] hover:bg-[#f7f7f7] hover:text-ink"
                       )}
                       title={member.status === "active" ? "Suspend access" : "Restore access"}
                     >
@@ -236,7 +236,7 @@ export default function TeamPage() {
                     <button
                       type="button"
                       onClick={() => setForm({ id: member.id, name: member.name, email: member.email, role: member.role, password: "" })}
-                      className="grid h-7 w-7 place-items-center rounded-full text-[#a79b88] hover:bg-cream-soft hover:text-[#5f574a]"
+                      className="grid h-7 w-7 place-items-center  text-[#a3a3a3] hover:bg-[#f7f7f7] hover:text-[#525252]"
                       title="Edit teammate"
                     >
                       <KeyRound size={13} />
@@ -245,7 +245,7 @@ export default function TeamPage() {
                       type="button"
                       disabled={self}
                       onClick={() => setDeleteTarget(member)}
-                      className="grid h-7 w-7 place-items-center rounded-full text-[#a79b88] transition hover:bg-cream-soft hover:text-ink disabled:opacity-30"
+                      className="grid h-7 w-7 place-items-center  text-[#a3a3a3] transition-colors hover:bg-[#f7f7f7] hover:text-ink disabled:opacity-30"
                       title="Remove teammate"
                     >
                       <Trash2 size={13} />
@@ -263,18 +263,18 @@ export default function TeamPage() {
             <Card key={role} className="p-4">
               <div className="flex items-center justify-between">
                 <Badge className={ROLE_INFO[role].className}>{ROLE_INFO[role].label}</Badge>
-                <span className="text-[10px] font-bold text-[#a79b88]">{members.filter((member) => member.role === role).length}</span>
+                <span className="text-[10px] font-bold text-[#a3a3a3]">{members.filter((member) => member.role === role).length}</span>
               </div>
               <p className="mt-2 text-[11px] leading-relaxed text-muted">{ROLE_INFO[role].description}</p>
             </Card>
           ))}
           <Card className="p-4">
-            <p className="flex items-center gap-1.5 text-[9px] font-bold tracking-[0.14em] text-[#5f574a] uppercase"><Mail size={11} /> Last sign-ins</p>
+            <p className="flex items-center gap-1.5 text-[9px] font-bold tracking-[0.14em] text-[#525252] uppercase"><Mail size={11} /> Last sign-ins</p>
             <div className="mt-2 space-y-2">
               {members.filter((member) => member.lastLoginAt).slice(0, 4).map((member) => (
                 <div key={member.id} className="flex items-center justify-between gap-2 text-[10.5px]">
-                  <span className="truncate font-medium text-[#5f574a]">{member.name}</span>
-                  <span className="shrink-0 text-[#a79b88]">{timeAgo(member.lastLoginAt)}</span>
+                  <span className="truncate font-medium text-[#525252]">{member.name}</span>
+                  <span className="shrink-0 text-[#a3a3a3]">{timeAgo(member.lastLoginAt)}</span>
                 </div>
               ))}
             </div>

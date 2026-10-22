@@ -153,7 +153,7 @@ export default function PartnersPage() {
                 <tr key={partner.id} className="cursor-pointer" onClick={() => open(partner)}>
                   <td>
                     <div className="flex items-center gap-2.5">
-                      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-cream-soft text-[#5f574a]"><Star size={14} /></span>
+                      <span className="grid h-9 w-9 shrink-0 place-items-center  bg-[#f7f7f7] text-[#525252]"><Star size={14} /></span>
                       <div className="min-w-0">
                         <p className="truncate text-[12px] font-semibold text-ink">{partner.venueName}</p>
                         <p className="truncate text-[10.5px] text-muted">{partner.venueType || "Venue"} · {partner.reference}</p>
@@ -161,14 +161,14 @@ export default function PartnersPage() {
                     </div>
                   </td>
                   <td>
-                    <p className="text-[11.5px] font-medium text-[#5f574a]">{partner.contactName}</p>
+                    <p className="text-[11.5px] font-medium text-[#525252]">{partner.contactName}</p>
                     <p className="text-[10.5px] text-muted">{partner.email}</p>
                   </td>
-                  <td><span className="flex items-center gap-1 text-[11px] text-[#5f574a]"><MapPin size={10} className="text-[#a79b88]" /> {partner.city || "—"}</span></td>
-                  <td><span className="text-[11px] text-[#5f574a]">{partner.rooms || "—"}</span></td>
+                  <td><span className="flex items-center gap-1 text-[11px] text-[#525252]"><MapPin size={10} className="text-[#a3a3a3]" /> {partner.city || "—"}</span></td>
+                  <td><span className="text-[11px] text-[#525252]">{partner.rooms || "—"}</span></td>
                   <td><StatusPill value={partner.status} map={PARTNER_STATUS} /></td>
                   <td><p className="text-[10.5px] text-muted">{timeAgo(partner.createdAt)}</p><p className="text-[9.5px] text-[#b3b3b3]">{formatDate(partner.createdAt)}</p></td>
-                  <td><ArrowUpRight size={13} className="text-[#a79b88]" /></td>
+                  <td><ArrowUpRight size={13} className="text-[#a3a3a3]" /></td>
                 </tr>
               ))}
             </tbody>
@@ -187,7 +187,7 @@ export default function PartnersPage() {
         size="lg"
         footer={detail ? (
           <div className="flex items-center justify-between">
-            <Button variant="ghost" size="sm" icon={Trash2} className="text-[#817665] hover:bg-cream-soft hover:text-ink" onClick={() => setDeleteTarget(detail)}>Delete</Button>
+            <Button variant="ghost" size="sm" icon={Trash2} className="text-[#6b6b6b] hover:bg-[#f7f7f7] hover:text-ink" onClick={() => setDeleteTarget(detail)}>Delete</Button>
             <div className="flex gap-2">
               <Button variant="secondary" size="sm" icon={Globe2} onClick={convert} loading={converting}>Create draft venue</Button>
               <Button variant="primary" size="sm" icon={Check} loading={saving} onClick={() => update({ status: "verified", message: note }, "Application verified")}>Verify</Button>
@@ -202,37 +202,37 @@ export default function PartnersPage() {
                 {Object.entries(PARTNER_STATUS).map(([value, item]) => <option key={value} value={value}>{item.label}</option>)}
               </Select>
               <div className="ml-auto flex items-center gap-1.5">
-                <a href={toPhoneHref(detail.phone)} className="grid h-8 w-8 place-items-center rounded-full bg-cream-soft text-[#5f574a] hover:bg-ink hover:text-white" title="Call"><Phone size={13} /></a>
-                <a href={whatsappHref(detail.phone, `Hi ${detail.contactName.split(" ")[0]}, this is Venue On My Plate.`)} target="_blank" rel="noreferrer" className="grid h-8 w-8 place-items-center rounded-full bg-cream-soft text-[#5f574a] hover:bg-ink hover:text-white" title="WhatsApp"><Send size={13} /></a>
-                <a href={mailtoHref(detail.email, `Venue On My Plate partnership — ${detail.venueName}`)} className="grid h-8 w-8 place-items-center rounded-full bg-cream-soft text-[#5f574a] hover:bg-[#525252] hover:text-white" title="Email"><Mail size={13} /></a>
+                <a href={toPhoneHref(detail.phone)} className="grid h-8 w-8 place-items-center  bg-[#f7f7f7] text-[#525252] hover:bg-ink hover:text-white" title="Call"><Phone size={13} /></a>
+                <a href={whatsappHref(detail.phone, `Hi ${detail.contactName.split(" ")[0]}, this is Venue On My Plate.`)} target="_blank" rel="noreferrer" className="grid h-8 w-8 place-items-center  bg-[#f7f7f7] text-[#525252] hover:bg-ink hover:text-white" title="WhatsApp"><Send size={13} /></a>
+                <a href={mailtoHref(detail.email, `Venue On My Plate partnership — ${detail.venueName}`)} className="grid h-8 w-8 place-items-center  bg-[#f7f7f7] text-[#525252] hover:bg-[#525252] hover:text-white" title="Email"><Mail size={13} /></a>
               </div>
             </div>
             <div className="grid gap-4 px-5 py-5 sm:grid-cols-2">
               <div>
-                <p className="text-[9px] font-bold tracking-[0.12em] text-[#a79b88] uppercase">Contact</p>
+                <p className="text-[9px] font-bold tracking-[0.12em] text-[#a3a3a3] uppercase">Contact</p>
                 <p className="mt-1 text-[12.5px] font-semibold text-ink">{detail.contactName}</p>
                 <p className="text-[11px] text-muted">{detail.email}</p>
                 <p className="text-[11px] text-muted">{detail.phone}</p>
               </div>
               <div>
-                <p className="text-[9px] font-bold tracking-[0.12em] text-[#a79b88] uppercase">Property</p>
+                <p className="text-[9px] font-bold tracking-[0.12em] text-[#a3a3a3] uppercase">Property</p>
                 <p className="mt-1 text-[12.5px] font-semibold text-ink">{detail.venueType || "Venue"}</p>
                 <p className="text-[11px] text-muted">{detail.city} {detail.rooms ? `· ${detail.rooms} rooms` : ""}</p>
-                {detail.website && <a href={detail.website} target="_blank" rel="noreferrer" className="mt-1 inline-flex items-center gap-1 text-[10.5px] font-semibold text-[#5f574a] hover:underline">Visit website <ArrowUpRight size={10} /></a>}
+                {detail.website && <a href={detail.website} target="_blank" rel="noreferrer" className="mt-1 inline-flex items-center gap-1 text-[10.5px] font-semibold text-[#525252] hover:underline">Visit website <ArrowUpRight size={10} /></a>}
               </div>
             </div>
             <div className="px-5 py-5">
-              <p className="text-[9px] font-bold tracking-[0.12em] text-[#a79b88] uppercase">Application message</p>
+              <p className="text-[9px] font-bold tracking-[0.12em] text-[#a3a3a3] uppercase">Application message</p>
               <Textarea rows={5} value={note} onChange={(event) => setNote(event.target.value)} className="mt-2 text-[12px]" />
               <div className="mt-2 flex justify-end"><Button variant="secondary" size="sm" loading={saving} onClick={() => update({ message: note }, "Message updated")}>Save note</Button></div>
             </div>
-            <div className="rounded-xl bg-cream-soft p-3 text-[10.5px] leading-relaxed text-muted">
-              <Badge className="mr-2 bg-white text-[#5f574a] ring-[#a3a3a3]/25">{detail.status}</Badge>
+            <div className=" bg-[#f7f7f7] p-3 text-[10.5px] leading-relaxed text-muted">
+              <Badge className="mr-2 bg-white text-[#525252] ring-[#a3a3a3]/25">{detail.status}</Badge>
               Creating a draft venue copies the partner&apos;s name, city, type and message into the catalogue — you can enrich it before publishing.
             </div>
-            <div className="flex items-center justify-between px-5 py-3 text-[10px] text-[#a79b88]">
+            <div className="flex items-center justify-between px-5 py-3 text-[10px] text-[#a3a3a3]">
               <span className="flex items-center gap-1"><Users size={10} /> Added {timeAgo(detail.createdAt)}</span>
-              <Link href="/venues" className="flex items-center gap-1 font-semibold text-[#5f574a] hover:underline">Open venues <ArrowUpRight size={10} /></Link>
+              <Link href="/venues" className="flex items-center gap-1 font-semibold text-[#525252] hover:underline">Open venues <ArrowUpRight size={10} /></Link>
             </div>
           </div>
         )}

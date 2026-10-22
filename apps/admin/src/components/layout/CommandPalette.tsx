@@ -155,20 +155,20 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
 
   return createPortal(
     <div className="fixed inset-0 z-[90] flex items-start justify-center px-4 pt-[10vh]">
-      <button type="button" aria-label="Close search" onClick={onClose} className="absolute inset-0 cursor-default bg-ink/40 backdrop-blur-[3px]" />
-      <div className="modal-in relative w-full max-w-[620px] overflow-hidden rounded-lg border border-line bg-paper shadow-[0_40px_120px_-30px_rgba(23,19,14,0.5)]">
+      <button type="button" aria-label="Close search" onClick={onClose} className="absolute inset-0 cursor-default bg-ink/35" />
+      <div className="modal-in relative w-full max-w-[620px] overflow-hidden border border-ink bg-white">
         <div className="flex items-center gap-3 border-b border-line px-4">
           {isValidating && debounced.length >= 2 ? (
             <Loader2 size={17} className="animate-spin text-muted" />
           ) : (
-            <Search size={17} className="text-[#9b8f7c]" />
+            <Search size={17} className="text-[#a3a3a3]" />
           )}
           <input
             ref={inputRef}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search enquiries, conversations, venues, journal…"
-            className="h-[54px] flex-1 bg-transparent text-[13.5px] text-ink placeholder:text-[#a79b88] focus:outline-none"
+            className="h-[54px] flex-1 bg-transparent text-[13.5px] text-ink placeholder:text-[#a3a3a3] focus:outline-none"
           />
           <Kbd>ESC</Kbd>
         </div>
@@ -176,7 +176,7 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
         <div className="scrollbar-thin max-h-[52vh] min-h-[180px] overflow-y-auto p-2">
           {items.length === 0 && (
             <div className="flex flex-col items-center justify-center px-6 py-12 text-center">
-              <Search size={20} className="text-[#9b8f7c]" />
+              <Search size={20} className="text-[#a3a3a3]" />
               <p className="mt-3 text-[13px] font-semibold text-ink">
                 {debounced.length < 2 ? "Type at least two characters" : "No matches found"}
               </p>
@@ -187,7 +187,7 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
           )}
           {Object.entries(groups).map(([group, groupItems]) => (
             <div key={group} className="mb-1.5">
-              <p className="px-2.5 py-1.5 text-[8.5px] font-semibold tracking-[0.18em] text-[#948771] uppercase">{group}</p>
+              <p className="px-2.5 py-1.5 text-[8.5px] font-semibold tracking-[0.18em] text-[#8a8a8a] uppercase">{group}</p>
               {groupItems.map((item) => {
                 runningIndex += 1;
                 const index = runningIndex;
@@ -202,11 +202,11 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
                       onClose();
                     }}
                     className={cn(
-                      "flex w-full items-center gap-3 rounded-md px-2.5 py-2.5 text-left transition",
-                      isActive ? "bg-cream-soft ring-1 ring-line" : "hover:bg-ink/[0.035]"
+                      "flex w-full items-center gap-3 px-2.5 py-2.5 text-left transition-colors",
+                      isActive ? "bg-[#f5f5f5]" : "hover:bg-[#fafafa]"
                     )}
                   >
-                    <span className={cn("grid h-8 w-8 shrink-0 place-items-center rounded-[5px]", isActive ? "bg-ink text-white" : "bg-cream-soft text-[#817665] ring-1 ring-line/70")}>
+                    <span className={cn("grid h-8 w-8 shrink-0 place-items-center", isActive ? "bg-ink text-white" : "bg-[#f5f5f5] text-[#6b6b6b] ring-1 ring-line/70")}>
                       <item.icon size={15} />
                     </span>
                     <span className="min-w-0 flex-1">
@@ -221,7 +221,7 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
           ))}
         </div>
 
-        <div className="flex items-center justify-between border-t border-line bg-cream-soft px-4 py-2.5 text-[9.5px] text-muted">
+        <div className="flex items-center justify-between border-t border-line bg-[#fafafa] px-4 py-2.5 text-[9px] text-muted">
           <span className="flex items-center gap-3">
             <span className="flex items-center gap-1">
               <Kbd>↑</Kbd>
@@ -231,7 +231,7 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
               <Kbd>↵</Kbd> open
             </span>
           </span>
-          <span className="font-semibold tracking-[0.12em] text-[#817665] uppercase">VOMP command</span>
+          <span className="font-semibold tracking-[0.12em] text-[#6b6b6b] uppercase">VOMP command</span>
         </div>
       </div>
     </div>,

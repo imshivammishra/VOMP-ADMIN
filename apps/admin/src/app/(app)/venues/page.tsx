@@ -313,11 +313,11 @@ function VenuesView() {
                 <tr key={venue.id} className="cursor-pointer" onClick={() => setForm(formFromVenue(venue))}>
                   <td>
                     <div className="flex items-center gap-3">
-                      <div className="h-11 w-14 shrink-0 overflow-hidden rounded-lg bg-cream">
+                      <div className="h-11 w-14 shrink-0 overflow-hidden  bg-[#f0f0f0]">
                         {venue.image ? (
                           <img src={venue.image} alt="" className="h-full w-full object-cover" loading="lazy" />
                         ) : (
-                          <div className="grid h-full w-full place-items-center text-[#a79b88]"><Building2 size={16} /></div>
+                          <div className="grid h-full w-full place-items-center text-[#a3a3a3]"><Building2 size={16} /></div>
                         )}
                       </div>
                       <div className="min-w-0">
@@ -329,15 +329,15 @@ function VenuesView() {
                     </div>
                   </td>
                   <td>
-                    <p className="text-[11.5px] font-medium text-[#5f574a]">{venue.type || "—"}</p>
+                    <p className="text-[11.5px] font-medium text-[#525252]">{venue.type || "—"}</p>
                     <p className="text-[10px] text-muted">{venue.setting}</p>
                   </td>
                   <td>
-                    <span className="flex items-center gap-1 text-[11px] text-[#5f574a]">
-                      <Users size={11} className="text-[#a79b88]" /> {venue.capacityMin}–{venue.capacityMax}
+                    <span className="flex items-center gap-1 text-[11px] text-[#525252]">
+                      <Users size={11} className="text-[#a3a3a3]" /> {venue.capacityMin}–{venue.capacityMax}
                     </span>
                   </td>
-                  <td><Badge className="bg-cream-soft text-[#5f574a] ring-ink/6">{venue.priceHint || "On request"}</Badge></td>
+                  <td><Badge className="bg-[#f7f7f7] text-[#525252] ring-ink/6">{venue.priceHint || "On request"}</Badge></td>
                   <td><StatusPill value={venue.status} map={PUBLISH_STATUS} /></td>
                   <td onClick={(event) => event.stopPropagation()}>
                     <button
@@ -347,10 +347,10 @@ function VenuesView() {
                       aria-pressed={venue.featured}
                       aria-label={venue.featured ? `Remove ${venue.name} from featured` : `Mark ${venue.name} as featured`}
                       className={cn(
-                        "grid h-7 w-7 place-items-center rounded-full transition disabled:opacity-40",
+                        "grid h-7 w-7 place-items-center  transition-colors disabled:opacity-40",
                         venue.featured
-                          ? "bg-cream-soft text-ink"
-                          : "text-[#c3b7a4] hover:bg-cream-soft hover:text-muted"
+                          ? "bg-[#f7f7f7] text-ink"
+                          : "text-[#cccccc] hover:bg-[#f7f7f7] hover:text-muted"
                       )}
                       title={venue.featured ? "Remove from featured" : "Mark as featured"}
                     >
@@ -359,7 +359,7 @@ function VenuesView() {
                   </td>
                   <td><span className="whitespace-nowrap text-[10px] text-muted">{formatDate(venue.updatedAt)}</span></td>
                   <td>
-                    <span className="grid h-7 w-7 place-items-center rounded-full text-[#a79b88] transition group-hover:text-[#5f574a]">
+                    <span className="grid h-7 w-7 place-items-center  text-[#a3a3a3] transition-colors group-hover:text-[#525252]">
                       <Pencil size={12} />
                     </span>
                   </td>
@@ -395,7 +395,7 @@ function VenuesView() {
                   variant="ghost"
                   size="sm"
                   icon={Trash2}
-                  className="text-[#817665] hover:bg-cream-soft hover:text-ink"
+                  className="text-[#6b6b6b] hover:bg-[#f7f7f7] hover:text-ink"
                   onClick={() => {
                     const venue = rows.find((row) => row.id === form.id);
                     if (venue) setDeleteTarget(venue);
@@ -468,9 +468,9 @@ function VenuesView() {
                 <Input value={form.image} onChange={(event) => setForm({ ...form, image: event.target.value })} placeholder="https://…" />
               </Field>
               {form.image && (
-                <div className="relative h-36 overflow-hidden rounded-xl border border-ink/8 bg-cream">
+                <div className="relative h-36 overflow-hidden  border border-ink/8 bg-[#f0f0f0]">
                   <img src={form.image} alt="" className="h-full w-full object-cover" />
-                  <span className="absolute right-2 bottom-2 rounded-full bg-ink/55 px-2 py-0.5 text-[9px] font-semibold text-white">Cover preview</span>
+                  <span className="absolute right-2 bottom-2  bg-ink/55 px-2 py-0.5 text-[9px] font-semibold text-white">Cover preview</span>
                 </div>
               )}
               <Field label="Image alt text">
@@ -493,8 +493,8 @@ function VenuesView() {
               </Field>
             </div>
 
-            <div className="rounded-xl bg-cream-soft p-3 text-[10.5px] leading-relaxed text-muted">
-              <Sparkles size={12} className="mr-1 inline text-[#5f574a]" />
+            <div className=" bg-[#f7f7f7] p-3 text-[10.5px] leading-relaxed text-muted">
+              <Sparkles size={12} className="mr-1 inline text-[#525252]" />
               Published venues are returned by the public API and appear on the website after its cache refreshes.
             </div>
           </div>
@@ -515,7 +515,7 @@ function VenuesView() {
 
 export default function VenuesPage() {
   return (
-    <Suspense fallback={<Skeleton className="h-[600px] rounded-xl" />}>
+    <Suspense fallback={<Skeleton className="h-[600px] " />}>
       <VenuesView />
     </Suspense>
   );

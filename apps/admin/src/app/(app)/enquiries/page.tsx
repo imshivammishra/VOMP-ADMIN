@@ -311,7 +311,7 @@ function EnquiriesView() {
             </Select>
             <Button variant="secondary" size="sm" onClick={() => setShowFilters((value) => !value)}>
               <Users size={13} /> Team
-              {activeFilters > 0 && <span className="ml-0.5 rounded-full bg-ink px-1.5 text-[9px] text-white">{activeFilters}</span>}
+              {activeFilters > 0 && <span className="ml-0.5  bg-ink px-1.5 text-[9px] text-white">{activeFilters}</span>}
             </Button>
             <Select value={sort} onChange={(event) => setSort(event.target.value)} className="h-9 w-auto min-w-[135px] py-0 text-[12px]">
               <option value="newest">Newest first</option>
@@ -320,7 +320,7 @@ function EnquiriesView() {
               <option value="updated">Recently updated</option>
             </Select>
             {(activeFilters > 0 || query || status !== "all") && (
-              <button type="button" onClick={clearFilters} className="flex items-center gap-1 text-[10.5px] font-semibold text-[#5f574a] hover:underline">
+              <button type="button" onClick={clearFilters} className="flex items-center gap-1 text-[10.5px] font-semibold text-[#525252] hover:underline">
                 <FilterX size={12} /> Clear
               </button>
             )}
@@ -400,7 +400,7 @@ function EnquiriesView() {
               {rows.map((enquiry) => (
                 <tr
                   key={enquiry.id}
-                  className={cn("group cursor-pointer", selected.includes(enquiry.id) && "bg-cream-soft/60")}
+                  className={cn("group cursor-pointer", selected.includes(enquiry.id) && "bg-[#f7f7f7]/60")}
                   onClick={() => openEnquiry(enquiry)}
                 >
                   <td onClick={(event) => event.stopPropagation()}>
@@ -428,16 +428,16 @@ function EnquiriesView() {
                     </div>
                   </td>
                   <td>
-                    <p className="text-[11.5px] font-medium text-[#5f574a]">{enquiry.eventType || "Celebration"}</p>
+                    <p className="text-[11.5px] font-medium text-[#525252]">{enquiry.eventType || "Celebration"}</p>
                     <p className="text-[10.5px] text-muted">
                       {enquiry.guestCount || "—"} · {enquiry.eventDate || "flexible"}
                     </p>
                   </td>
                   <td>
-                    <span className="text-[11px] text-[#5f574a]">{enquiry.city || "—"}</span>
+                    <span className="text-[11px] text-[#525252]">{enquiry.city || "—"}</span>
                   </td>
                   <td>
-                    <Badge className="bg-cream-soft text-[#5f574a] ring-ink/6">{sourceLabel(enquiry.source)}</Badge>
+                    <Badge className="bg-[#f7f7f7] text-[#525252] ring-ink/6">{sourceLabel(enquiry.source)}</Badge>
                   </td>
                   <td>
                     <StatusPill value={enquiry.status} map={ENQUIRY_STATUS} />
@@ -450,7 +450,7 @@ function EnquiriesView() {
                     <p className="whitespace-nowrap text-[9.5px] text-[#b3b3b3]">{enquiry.reference}</p>
                   </td>
                   <td>
-                    <span className="grid h-7 w-7 place-items-center rounded-full text-[#a79b88] transition group-hover:bg-cream-soft group-hover:text-[#5f574a]">
+                    <span className="grid h-7 w-7 place-items-center  text-[#a3a3a3] transition-colors group-hover:bg-[#f7f7f7] group-hover:text-[#525252]">
                       <ChevronRight size={14} />
                     </span>
                   </td>
@@ -493,7 +493,7 @@ function EnquiriesView() {
       </Card>
 
       {selected.length > 0 && (
-        <div className="fixed bottom-5 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 rounded-xl border border-white/10 bg-ink px-3 py-2.5 text-white shadow-[0_24px_60px_-20px_rgba(0,0,0,0.45)] lg:left-[calc(50%+134px)]">
+        <div className="fixed bottom-5 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2  border border-white/10 bg-ink px-3 py-2.5 text-white  lg:left-[calc(50%+134px)]">
           <span className="px-2 text-[11px] font-semibold">{selected.length} selected</span>
           <div className="h-5 w-px bg-white/15" />
           <Select
@@ -529,7 +529,7 @@ function EnquiriesView() {
           <Button variant="danger" size="sm" icon={Trash2} onClick={() => bulk("delete")} disabled={saving}>
             Delete
           </Button>
-          <button type="button" onClick={() => setSelected([])} aria-label="Clear selection" className="grid h-7 w-7 place-items-center rounded-full text-white/50 hover:bg-white/10 hover:text-white">
+          <button type="button" onClick={() => setSelected([])} aria-label="Clear selection" className="grid h-7 w-7 place-items-center  text-white/50 hover:bg-white/10 hover:text-white">
             <X size={14} />
           </button>
         </div>
@@ -552,7 +552,7 @@ function EnquiriesView() {
                 variant="ghost"
                 size="sm"
                 icon={Trash2}
-                className="text-[#817665] hover:bg-cream-soft hover:text-ink"
+                className="text-[#6b6b6b] hover:bg-[#f7f7f7] hover:text-ink"
                 onClick={() => setDeleteTarget(detail)}
               >
                 Delete
@@ -635,51 +635,51 @@ function EnquiriesView() {
                 ))}
               </Select>
               <div className="ml-auto flex items-center gap-1.5">
-                <a href={toPhoneHref(detail.phone)} className="grid h-8 w-8 place-items-center rounded-full bg-cream-soft text-[#5f574a] transition hover:bg-ink hover:text-white" title="Call">
+                <a href={toPhoneHref(detail.phone)} className="grid h-8 w-8 place-items-center  bg-[#f7f7f7] text-[#525252] transition-colors hover:bg-ink hover:text-white" title="Call">
                   <Phone size={13} />
                 </a>
-                <a href={whatsappHref(detail.phone, `Hi ${detail.name.split(" ")[0]}, this is Venue On My Plate.`)} target="_blank" rel="noreferrer" className="grid h-8 w-8 place-items-center rounded-full bg-cream-soft text-[#5f574a] transition hover:bg-ink hover:text-white" title="WhatsApp">
+                <a href={whatsappHref(detail.phone, `Hi ${detail.name.split(" ")[0]}, this is Venue On My Plate.`)} target="_blank" rel="noreferrer" className="grid h-8 w-8 place-items-center  bg-[#f7f7f7] text-[#525252] transition-colors hover:bg-ink hover:text-white" title="WhatsApp">
                   <Send size={13} />
                 </a>
-                <a href={mailtoHref(detail.email, `Your Venue On My Plate enquiry ${detail.reference}`)} className="grid h-8 w-8 place-items-center rounded-full bg-cream-soft text-[#5f574a] transition hover:bg-[#525252] hover:text-white" title="Email">
+                <a href={mailtoHref(detail.email, `Your Venue On My Plate enquiry ${detail.reference}`)} className="grid h-8 w-8 place-items-center  bg-[#f7f7f7] text-[#525252] transition-colors hover:bg-[#525252] hover:text-white" title="Email">
                   <Mail size={13} />
                 </a>
               </div>
             </div>
 
             <div className="px-5 py-5">
-              <p className="text-[9.5px] font-bold tracking-[0.18em] text-[#5f574a] uppercase">Contact</p>
+              <p className="text-[9.5px] font-bold tracking-[0.18em] text-[#525252] uppercase">Contact</p>
               <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-xl border border-ink/6 bg-cream-soft p-3">
-                  <p className="flex items-center gap-1.5 text-[9px] font-bold tracking-[0.12em] text-[#a79b88] uppercase">
+                <div className=" border border-ink/6 bg-[#f7f7f7] p-3">
+                  <p className="flex items-center gap-1.5 text-[9px] font-bold tracking-[0.12em] text-[#a3a3a3] uppercase">
                     <Phone size={10} /> Phone
                   </p>
                   <button
                     type="button"
                     onClick={() => copyText(detail.phone).then(() => toast("Phone number copied"))}
-                    className="mt-1 flex items-center gap-1.5 text-[12.5px] font-semibold text-ink hover:text-[#5f574a]"
+                    className="mt-1 flex items-center gap-1.5 text-[12.5px] font-semibold text-ink hover:text-[#525252]"
                   >
-                    {detail.phone} <Copy size={10} className="text-[#a79b88]" />
+                    {detail.phone} <Copy size={10} className="text-[#a3a3a3]" />
                   </button>
                 </div>
-                <div className="rounded-xl border border-ink/6 bg-cream-soft p-3">
-                  <p className="flex items-center gap-1.5 text-[9px] font-bold tracking-[0.12em] text-[#a79b88] uppercase">
+                <div className=" border border-ink/6 bg-[#f7f7f7] p-3">
+                  <p className="flex items-center gap-1.5 text-[9px] font-bold tracking-[0.12em] text-[#a3a3a3] uppercase">
                     <Mail size={10} /> Email
                   </p>
                   <button
                     type="button"
                     onClick={() => copyText(detail.email).then(() => toast("Email copied"))}
-                    className="mt-1 flex max-w-full items-center gap-1.5 truncate text-[12.5px] font-semibold text-ink hover:text-[#5f574a]"
+                    className="mt-1 flex max-w-full items-center gap-1.5 truncate text-[12.5px] font-semibold text-ink hover:text-[#525252]"
                   >
                     <span className="truncate">{detail.email || "Not shared"}</span>
-                    {detail.email && <Copy size={10} className="shrink-0 text-[#a79b88]" />}
+                    {detail.email && <Copy size={10} className="shrink-0 text-[#a3a3a3]" />}
                   </button>
                 </div>
               </div>
             </div>
 
             <div className="px-5 py-5">
-              <p className="text-[9.5px] font-bold tracking-[0.18em] text-[#5f574a] uppercase">Event brief</p>
+              <p className="text-[9.5px] font-bold tracking-[0.18em] text-[#525252] uppercase">Event brief</p>
               <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-4 sm:grid-cols-3">
                 {[
                   ["City", detail.city || "—", MapPin],
@@ -692,7 +692,7 @@ function EnquiriesView() {
                   const Cmp = Icon as typeof MapPin;
                   return (
                     <div key={String(label)}>
-                      <p className="flex items-center gap-1 text-[9px] font-bold tracking-[0.1em] text-[#a79b88] uppercase">
+                      <p className="flex items-center gap-1 text-[9px] font-bold tracking-[0.1em] text-[#a3a3a3] uppercase">
                         <Cmp size={9} /> {String(label)}
                       </p>
                       <p className="mt-1 text-[12px] font-semibold text-ink">{String(value)}</p>
@@ -701,16 +701,16 @@ function EnquiriesView() {
                 })}
               </div>
               {detail.message && (
-                <div className="mt-4 rounded-xl border border-line bg-cream-soft p-4">
-                  <p className="text-[9px] font-bold tracking-[0.12em] text-[#5f574a] uppercase">Message</p>
-                  <p className="mt-1.5 text-[12.5px] leading-relaxed text-[#5f574a]">{detail.message}</p>
+                <div className="mt-4  border border-line bg-[#f7f7f7] p-4">
+                  <p className="text-[9px] font-bold tracking-[0.12em] text-[#525252] uppercase">Message</p>
+                  <p className="mt-1.5 text-[12.5px] leading-relaxed text-[#525252]">{detail.message}</p>
                 </div>
               )}
             </div>
 
             <div className="px-5 py-5">
               <div className="flex items-center justify-between">
-                <p className="flex items-center gap-1.5 text-[9.5px] font-bold tracking-[0.18em] text-[#5f574a] uppercase">
+                <p className="flex items-center gap-1.5 text-[9.5px] font-bold tracking-[0.18em] text-[#525252] uppercase">
                   <Tags size={11} /> Tags
                 </p>
                 <Button
@@ -729,11 +729,11 @@ function EnquiriesView() {
               </div>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {detail.tags.map((tag) => (
-                  <Badge key={tag} className="bg-cream-soft text-[#5f574a] ring-ink/6">
+                  <Badge key={tag} className="bg-[#f7f7f7] text-[#525252] ring-ink/6">
                     {tag}
                   </Badge>
                 ))}
-                {detail.tags.length === 0 && <span className="text-[11px] text-[#a79b88]">No tags yet</span>}
+                {detail.tags.length === 0 && <span className="text-[11px] text-[#a3a3a3]">No tags yet</span>}
               </div>
               <Input
                 value={tagDraft}
@@ -744,7 +744,7 @@ function EnquiriesView() {
             </div>
 
             <div className="px-5 py-5">
-              <p className="text-[9.5px] font-bold tracking-[0.18em] text-[#5f574a] uppercase">Internal notes</p>
+              <p className="text-[9.5px] font-bold tracking-[0.18em] text-[#525252] uppercase">Internal notes</p>
               <div className="mt-3 flex gap-2">
                 <Textarea
                   value={note}
@@ -761,19 +761,19 @@ function EnquiriesView() {
                 {detail.notes.map((item) => (
                   <div key={item.id} className="flex gap-2.5">
                     <Avatar name={item.author} size="xs" />
-                    <div className="min-w-0 flex-1 rounded-xl bg-cream-soft p-3">
-                      <p className="text-[11.5px] leading-relaxed text-[#5f574a]">{item.text}</p>
-                      <p className="mt-1 text-[9.5px] text-[#a79b88]">
+                    <div className="min-w-0 flex-1  bg-[#f7f7f7] p-3">
+                      <p className="text-[11.5px] leading-relaxed text-[#525252]">{item.text}</p>
+                      <p className="mt-1 text-[9.5px] text-[#a3a3a3]">
                         {item.author} · {timeAgo(item.at)}
                       </p>
                     </div>
                   </div>
                 ))}
-                {detail.notes.length === 0 && <p className="text-[11px] text-[#a79b88]">No internal notes yet.</p>}
+                {detail.notes.length === 0 && <p className="text-[11px] text-[#a3a3a3]">No internal notes yet.</p>}
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-2 bg-cream-soft px-5 py-3 text-[10px] text-[#a79b88]">
+            <div className="flex flex-wrap items-center justify-between gap-2 bg-[#f7f7f7] px-5 py-3 text-[10px] text-[#a3a3a3]">
               <span>Created {formatDate(detail.createdAt, { hour: "numeric", minute: "2-digit" })}</span>
               <span className="flex items-center gap-1">
                 <Check size={11} /> Updated {timeAgo(detail.updatedAt)}
@@ -797,7 +797,7 @@ function EnquiriesView() {
 
 export default function EnquiriesPage() {
   return (
-    <Suspense fallback={<Skeleton className="h-[600px] rounded-xl" />}>
+    <Suspense fallback={<Skeleton className="h-[600px] " />}>
       <EnquiriesView />
     </Suspense>
   );

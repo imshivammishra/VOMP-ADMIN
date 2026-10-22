@@ -261,40 +261,40 @@ export default function ReviewsPage() {
 
       <div className="mb-5 grid gap-4 sm:grid-cols-3">
         <Card className="p-4">
-          <p className="text-[8.5px] font-semibold tracking-[0.14em] text-[#8b7e69] uppercase">Published</p>
+          <p className="text-[8.5px] font-semibold tracking-[0.14em] text-[#737373] uppercase">Published</p>
           <p className="font-display mt-1 text-[34px] leading-none font-semibold tracking-[-0.02em] text-ink">{published}</p>
-          <p className="mt-1.5 text-[10.5px] text-[#817665]">Visible on the website</p>
+          <p className="mt-1.5 text-[10.5px] text-[#6b6b6b]">Visible on the website</p>
         </Card>
         <Card className="p-4">
-          <p className="text-[8.5px] font-semibold tracking-[0.14em] text-[#8b7e69] uppercase">Drafts</p>
+          <p className="text-[8.5px] font-semibold tracking-[0.14em] text-[#737373] uppercase">Drafts</p>
           <p className="font-display mt-1 text-[34px] leading-none font-semibold tracking-[-0.02em] text-ink">{drafts}</p>
-          <p className="mt-1.5 text-[10.5px] text-[#817665]">Waiting to be reviewed</p>
+          <p className="mt-1.5 text-[10.5px] text-[#6b6b6b]">Waiting to be reviewed</p>
         </Card>
         <Card className="p-4">
-          <p className="text-[8.5px] font-semibold tracking-[0.14em] text-[#8b7e69] uppercase">Average rating</p>
+          <p className="text-[8.5px] font-semibold tracking-[0.14em] text-[#737373] uppercase">Average rating</p>
           <p className="font-display mt-1 text-[34px] leading-none font-semibold tracking-[-0.02em] text-ink">{average}</p>
-          <p className="mt-1.5 text-[10.5px] text-[#817665]">Across this view</p>
+          <p className="mt-1.5 text-[10.5px] text-[#6b6b6b]">Across this view</p>
         </Card>
       </div>
 
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <Tabs tabs={tabs} value={status} onChange={setStatus} />
-        <p className="text-[10.5px] text-[#948771]">Featured reviews are shown first.</p>
+        <p className="text-[10.5px] text-[#8a8a8a]">Featured reviews are shown first.</p>
       </div>
 
       {!data && (
         <div className="grid gap-4 md:grid-cols-2">
-          {Array.from({ length: 4 }).map((_, index) => <Skeleton key={index} className="h-[210px] rounded-xl" />)}
+          {Array.from({ length: 4 }).map((_, index) => <Skeleton key={index} className="h-[210px] " />)}
         </div>
       )}
 
       {data && reviews.length === 0 && (
         <Card className="p-10 text-center">
-          <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-cream-soft text-[#817665]"><Star size={20} /></span>
+          <span className="mx-auto grid h-12 w-12 place-items-center  bg-[#f7f7f7] text-[#6b6b6b]"><Star size={20} /></span>
           <p className="font-display mt-3 text-[24px] font-semibold tracking-[-0.02em] text-ink">
             {status === "all" ? "No reviews yet." : `No ${status} reviews.`}
           </p>
-          <p className="mx-auto mt-1 max-w-sm text-[12px] leading-relaxed text-[#817665]">
+          <p className="mx-auto mt-1 max-w-sm text-[12px] leading-relaxed text-[#6b6b6b]">
             Add a real client review and it will appear on the homepage as soon as it is published.
           </p>
           {status === "all" && <Button className="mt-4" size="sm" icon={Plus} onClick={() => setForm({ ...EMPTY })}>Add the first review</Button>}
@@ -304,12 +304,12 @@ export default function ReviewsPage() {
       {reviews.length > 0 && (
         <div className="grid gap-4 md:grid-cols-2">
           {reviews.map((review, index) => (
-            <Card key={review.id} className="flex flex-col p-5 transition hover:border-line-strong">
+            <Card key={review.id} className="flex flex-col p-5 transition-colors hover:border-line-strong">
               <div className="flex items-start gap-3">
                 {review.image ? (
-                  <img src={review.image} alt={review.name} className="h-11 w-11 shrink-0 rounded-full object-cover" />
+                  <img src={review.image} alt={review.name} className="h-11 w-11 shrink-0  object-cover" />
                 ) : (
-                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-cream-soft text-[12px] font-semibold text-[#817665]">
+                  <span className="grid h-11 w-11 shrink-0 place-items-center  bg-[#f7f7f7] text-[12px] font-semibold text-[#6b6b6b]">
                     {review.name.slice(0, 1).toUpperCase()}
                   </span>
                 )}
@@ -319,15 +319,15 @@ export default function ReviewsPage() {
                     <StatusPill
                       value={review.status}
                       map={{
-                        published: { label: "Published", className: "bg-cream-soft text-[#5f574a] ring-line", dot: "bg-ink" },
-                        draft: { label: "Draft", className: "bg-white text-[#817665] ring-line", dot: "bg-[#d7ccba]" },
+                        published: { label: "Published", className: "bg-[#f7f7f7] text-[#525252] ring-line", dot: "bg-ink" },
+                        draft: { label: "Draft", className: "bg-white text-[#6b6b6b] ring-line", dot: "bg-[#d4d4d4]" },
                       }}
                     />
                     {review.featured && <Badge className="bg-ink text-white ring-ink">Featured</Badge>}
                   </div>
                   <div className="mt-1 flex flex-wrap items-center gap-2">
                     <Stars rating={review.rating} />
-                    {review.context && <span className="text-[10.5px] text-[#948771]">{review.context}</span>}
+                    {review.context && <span className="text-[10.5px] text-[#8a8a8a]">{review.context}</span>}
                   </div>
                 </div>
               </div>
@@ -336,11 +336,11 @@ export default function ReviewsPage() {
                 &ldquo;{review.quote}&rdquo;
               </blockquote>
 
-              <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-[#f0e9dd] pt-3">
+              <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-[#f0f0f0] pt-3">
                 <button
                   type="button"
                   onClick={() => toggleFeatured(review)}
-                  className="inline-flex items-center gap-1.5 text-[10.5px] font-medium text-[#817665] transition hover:text-ink"
+                  className="inline-flex items-center gap-1.5 text-[10.5px] font-medium text-[#6b6b6b] transition-colors hover:text-ink"
                 >
                   <Star size={11} className={review.featured ? "fill-black text-ink" : ""} />
                   {review.featured ? "Featured" : "Feature this review"}
@@ -349,7 +349,7 @@ export default function ReviewsPage() {
                   <Button variant="ghost" size="sm" icon={ArrowUp} aria-label="Move up" disabled={index === 0 || moving} onClick={() => move(review, -1)} className="h-8 w-8 px-0" />
                   <Button variant="ghost" size="sm" icon={ArrowDown} aria-label="Move down" disabled={index === reviews.length - 1 || moving} onClick={() => move(review, 1)} className="h-8 w-8 px-0" />
                   <Button variant="secondary" size="sm" icon={Pencil} onClick={() => setForm(formFromReview(review))}>Edit</Button>
-                  <Button variant="ghost" size="sm" icon={Trash2} aria-label="Delete" onClick={() => setDeleteTarget(review)} className="h-8 w-8 px-0 text-[#948771] hover:text-ink" />
+                  <Button variant="ghost" size="sm" icon={Trash2} aria-label="Delete" onClick={() => setDeleteTarget(review)} className="h-8 w-8 px-0 text-[#8a8a8a] hover:text-ink" />
                 </div>
               </div>
             </Card>
@@ -366,7 +366,7 @@ export default function ReviewsPage() {
         footer={
           form ? (
             <div className="flex items-center justify-between">
-              <p className="text-[10.5px] text-[#948771]">{form.status === "published" ? "Visible on the website after saving." : "Saved as a draft."}</p>
+              <p className="text-[10.5px] text-[#8a8a8a]">{form.status === "published" ? "Visible on the website after saving." : "Saved as a draft."}</p>
               <div className="flex gap-2">
                 <Button variant="secondary" size="sm" onClick={() => setForm(null)}>Cancel</Button>
                 <Button size="sm" icon={Check} loading={saving} onClick={save}>Save review</Button>
@@ -410,7 +410,7 @@ export default function ReviewsPage() {
             <Field label="Venue slug" hint="Optional. Links this review to a venue page.">
               <Input value={form.venueSlug} onChange={(event) => set("venueSlug", event.target.value)} placeholder="venue-slug" />
             </Field>
-            <div className="rounded-lg border border-line bg-cream-soft p-4">
+            <div className=" border border-line bg-[#f7f7f7] p-4">
               <Switch
                 checked={form.featured}
                 onChange={(value) => set("featured", value)}
@@ -419,7 +419,7 @@ export default function ReviewsPage() {
               />
             </div>
             {form.id && (
-              <p className="text-[10px] text-[#948771]">Last updated {formatDate(form.updatedAt || new Date().toISOString())}</p>
+              <p className="text-[10px] text-[#8a8a8a]">Last updated {formatDate(form.updatedAt || new Date().toISOString())}</p>
             )}
           </div>
         )}

@@ -231,37 +231,37 @@ function BlockPreview({ block }: { block: ContentBlock }) {
   const meta = block.meta || {};
   if (block.section === "hero" && block.blockKey === "video") {
     return (
-      <span className="grid h-14 w-24 shrink-0 place-items-center overflow-hidden rounded-md bg-ink text-white">
+      <span className="grid h-14 w-24 shrink-0 place-items-center overflow-hidden  bg-ink text-white">
         <Video size={18} />
       </span>
     );
   }
   if (block.section === "hero") {
     return block.image ? (
-      <img src={block.image} alt={block.imageAlt || block.title} className="h-14 w-24 shrink-0 rounded-md object-cover" />
+      <img src={block.image} alt={block.imageAlt || block.title} className="h-14 w-24 shrink-0  object-cover" />
     ) : (
-      <span className="grid h-14 w-24 shrink-0 place-items-center rounded-md bg-cream-soft text-[#948771]"><ImageIcon size={18} /></span>
+      <span className="grid h-14 w-24 shrink-0 place-items-center  bg-[#f7f7f7] text-[#8a8a8a]"><ImageIcon size={18} /></span>
     );
   }
   if (block.section === "gallery" || block.section === "about") {
     return block.image ? (
-      <img src={block.image} alt={block.imageAlt || block.title} className="h-14 w-24 shrink-0 rounded-md object-cover" />
+      <img src={block.image} alt={block.imageAlt || block.title} className="h-14 w-24 shrink-0  object-cover" />
     ) : (
-      <span className="grid h-14 w-24 shrink-0 place-items-center rounded-md bg-cream-soft text-[#948771]"><ImageIcon size={18} /></span>
+      <span className="grid h-14 w-24 shrink-0 place-items-center  bg-[#f7f7f7] text-[#8a8a8a]"><ImageIcon size={18} /></span>
     );
   }
   if (block.section === "film") {
     return (
-      <span className="relative grid h-14 w-24 shrink-0 place-items-center overflow-hidden rounded-md bg-ink text-white">
+      <span className="relative grid h-14 w-24 shrink-0 place-items-center overflow-hidden  bg-ink text-white">
         <Video size={18} />
-        {meta.placement === "band" && <span className="absolute right-1 bottom-1 rounded bg-white/20 px-1 text-[8px]">BAND</span>}
+        {meta.placement === "band" && <span className="absolute right-1 bottom-1  bg-white/20 px-1 text-[8px]">BAND</span>}
       </span>
     );
   }
   if (block.section === "heading") {
-    return <span className="grid h-14 w-24 shrink-0 place-items-center rounded-md bg-cream-soft text-[#817665]"><Type size={18} /></span>;
+    return <span className="grid h-14 w-24 shrink-0 place-items-center  bg-[#f7f7f7] text-[#6b6b6b]"><Type size={18} /></span>;
   }
-  return <span className="grid h-14 w-24 shrink-0 place-items-center rounded-md bg-cream-soft text-[#817665]"><FileText size={18} /></span>;
+  return <span className="grid h-14 w-24 shrink-0 place-items-center  bg-[#f7f7f7] text-[#6b6b6b]"><FileText size={18} /></span>;
 }
 
 export default function WebsiteContentPage() {
@@ -438,7 +438,7 @@ export default function WebsiteContentPage() {
               href={process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3100"}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex h-10 items-center gap-2 rounded-lg border border-line-strong bg-white px-4 text-[12px] font-semibold text-ink transition hover:border-ink hover:bg-cream-soft"
+              className="inline-flex h-10 items-center gap-2  border border-line-strong bg-white px-4 text-[12px] font-semibold text-ink transition-colors hover:border-ink hover:bg-[#f7f7f7]"
             >
               View website <ExternalLink size={13} />
             </Link>
@@ -450,24 +450,24 @@ export default function WebsiteContentPage() {
       />
 
       <Card className="mb-5 flex items-start gap-3 p-4">
-        <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-full bg-cream-soft text-muted">
+        <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center  bg-[#f7f7f7] text-muted">
           <HelpCircle size={15} />
         </span>
         <div>
           <p className="text-[12px] font-semibold text-ink">Changes save to the live website.</p>
-          <p className="mt-0.5 text-[11.5px] leading-relaxed text-[#817665]">
+          <p className="mt-0.5 text-[11.5px] leading-relaxed text-[#6b6b6b]">
             Draft blocks stay hidden from visitors. Images and videos can be chosen from the media library, or pasted as a URL.
             Reviews are managed separately under <Link href="/reviews" className="font-semibold text-ink underline underline-offset-2">Reviews</Link>.
           </p>
         </div>
       </Card>
 
-      <div className="mb-5 overflow-hidden rounded-xl border border-line bg-white">
+      <div className="mb-5 overflow-hidden  border border-line bg-white">
         <Tabs tabs={tabs} value={section} onChange={(value) => setSection(value as ContentSection)} className="border-b border-line p-2" />
         <div className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-[12px] font-semibold text-ink">{activeSection.label}</p>
-            <p className="mt-0.5 text-[11px] text-[#817665]">{activeSection.hint}</p>
+            <p className="mt-0.5 text-[11px] text-[#6b6b6b]">{activeSection.hint}</p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             {section === "hero" && !sectionBlocks.some((block) => block.blockKey === "video") && (
@@ -498,7 +498,7 @@ export default function WebsiteContentPage() {
       {!data && (
         <div className="space-y-3">
           {Array.from({ length: 5 }).map((_, index) => (
-            <Skeleton key={index} className="h-[86px] rounded-xl" />
+            <Skeleton key={index} className="h-[86px] " />
           ))}
         </div>
       )}
@@ -506,7 +506,7 @@ export default function WebsiteContentPage() {
       {data && sectionBlocks.length === 0 && (
         <Card className="p-10 text-center">
           <p className="font-display text-[24px] font-semibold tracking-[-0.02em] text-ink">Nothing here yet.</p>
-          <p className="mx-auto mt-1 max-w-md text-[12px] leading-relaxed text-[#817665]">
+          <p className="mx-auto mt-1 max-w-md text-[12px] leading-relaxed text-[#6b6b6b]">
             Add the first block for this section. It will appear on the homepage as soon as it is published.
           </p>
           {!isSingleBlockSection && (
@@ -520,7 +520,7 @@ export default function WebsiteContentPage() {
       {sectionBlocks.length > 0 && (
         <div className="space-y-3">
           {sectionBlocks.map((block, index) => (
-            <Card key={block.id} className="group p-3 transition hover:border-line-strong">
+            <Card key={block.id} className="group p-3 transition-colors hover:border-line-strong">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
                 <div className="flex min-w-0 flex-1 items-start gap-3">
                   <BlockPreview block={block} />
@@ -530,26 +530,26 @@ export default function WebsiteContentPage() {
                       <StatusPill
                         value={block.status}
                         map={{
-                          published: { label: "Published", className: "bg-cream-soft text-[#5f574a] ring-line", dot: "bg-ink" },
-                          draft: { label: "Draft", className: "bg-white text-[#817665] ring-line", dot: "bg-[#d7ccba]" },
+                          published: { label: "Published", className: "bg-[#f7f7f7] text-[#525252] ring-line", dot: "bg-ink" },
+                          draft: { label: "Draft", className: "bg-white text-[#6b6b6b] ring-line", dot: "bg-[#d4d4d4]" },
                         }}
                       />
                     </div>
-                    <p className="mt-1 line-clamp-2 text-[11px] leading-relaxed text-[#817665]">
+                    <p className="mt-1 line-clamp-2 text-[11px] leading-relaxed text-[#6b6b6b]">
                       {block.section === "heading"
                         ? [block.title, block.subtitle, block.body].filter(Boolean).join(" · ")
                         : block.section === "hero" && block.blockKey === "video"
                           ? block.title || "No video selected"
                           : [block.subtitle, block.body].filter(Boolean).join(" · ") || block.title}
                     </p>
-                    <p className="mt-1.5 text-[9.5px] text-[#948771]">Updated {formatDate(block.updatedAt)}</p>
+                    <p className="mt-1.5 text-[9.5px] text-[#8a8a8a]">Updated {formatDate(block.updatedAt)}</p>
                   </div>
                 </div>
                 <div className="flex shrink-0 items-center gap-0.5 self-end sm:self-start">
                   <Button variant="ghost" size="sm" icon={ArrowUp} aria-label="Move up" disabled={index === 0 || moving} onClick={() => move(block, -1)} className="h-8 w-8 px-0" />
                   <Button variant="ghost" size="sm" icon={ArrowDown} aria-label="Move down" disabled={index === sectionBlocks.length - 1 || moving} onClick={() => move(block, 1)} className="h-8 w-8 px-0" />
                   <Button variant="secondary" size="sm" icon={Pencil} onClick={() => setForm(formFromBlock(block))}>Edit</Button>
-                  <Button variant="ghost" size="sm" icon={Trash2} aria-label="Delete" onClick={() => setDeleteTarget(block)} className="h-8 w-8 px-0 text-[#948771] hover:text-ink" />
+                  <Button variant="ghost" size="sm" icon={Trash2} aria-label="Delete" onClick={() => setDeleteTarget(block)} className="h-8 w-8 px-0 text-[#8a8a8a] hover:text-ink" />
                 </div>
               </div>
             </Card>
@@ -566,7 +566,7 @@ export default function WebsiteContentPage() {
         footer={
           form ? (
             <div className="flex items-center justify-between">
-              <p className="text-[10.5px] text-[#948771]">
+              <p className="text-[10.5px] text-[#8a8a8a]">
                 {form.status === "published" ? "Visible on the website after saving." : "Saved as a draft — hidden from visitors."}
               </p>
               <div className="flex gap-2">
@@ -742,9 +742,9 @@ export default function WebsiteContentPage() {
                 </Select>
               </Field>
               {form.id && (
-                <div className="rounded-lg bg-cream-soft px-3 py-2.5">
-                  <p className="text-[10px] text-[#948771]">Last updated</p>
-                  <p className="mt-0.5 text-[11.5px] font-medium text-[#5f574a]">{formatDate(form.updatedAt || new Date().toISOString())}</p>
+                <div className=" bg-[#f7f7f7] px-3 py-2.5">
+                  <p className="text-[10px] text-[#8a8a8a]">Last updated</p>
+                  <p className="mt-0.5 text-[11.5px] font-medium text-[#525252]">{formatDate(form.updatedAt || new Date().toISOString())}</p>
                 </div>
               )}
             </div>

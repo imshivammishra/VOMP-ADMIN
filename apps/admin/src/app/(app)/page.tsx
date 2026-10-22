@@ -33,22 +33,22 @@ import { Avatar, Button, Card, PageHeader, Skeleton, StatusPill } from "@/compon
 import { SourceBars, StatusDonut, TrendChart } from "@/components/charts";
 
 const STATUS_COLORS: Record<string, string> = {
-  new: "#17130e",
-  contacted: "#5b5245",
-  qualified: "#8c7f6c",
-  won: "#3d372f",
-  lost: "#b1a48f",
-  closed: "#e1d7c7",
+  new: "#0a0a0a",
+  contacted: "#404040",
+  qualified: "#737373",
+  won: "#262626",
+  lost: "#a3a3a3",
+  closed: "#e5e5e5",
 };
 
 function Delta({ current, previous }: { current: number; previous: number }) {
   if (previous === 0 && current === 0) {
-    return <span className="text-[11px] text-[#948771]">No change</span>;
+    return <span className="text-[11px] text-[#8a8a8a]">No change</span>;
   }
   const change = previous === 0 ? 100 : Math.round(((current - previous) / previous) * 100);
   const up = change >= 0;
   return (
-    <span className={cn("inline-flex items-center gap-1 text-[11px]", up ? "text-muted" : "text-[#948771]")}>
+    <span className={cn("inline-flex items-center gap-1 text-[11px]", up ? "text-muted" : "text-[#8a8a8a]")}>
       {up ? <ArrowUpRight size={11} /> : <ArrowDownRight size={11} />}
       {Math.abs(change)}% vs last week
     </span>
@@ -73,24 +73,24 @@ function KpiCard({
   return (
     <Link
       href={href}
-      className="group rounded-[12px] border border-line bg-paper p-5 transition hover:-translate-y-0.5 hover:border-line-strong hover:shadow-[0_20px_44px_-36px_rgba(23,19,14,0.55)]"
+      className="group border border-line bg-white p-5 transition-colors duration-150 hover:border-ink"
     >
       <div className="flex items-start justify-between gap-3">
-        <span className="grid h-10 w-10 place-items-center rounded-[9px] bg-cream-soft text-brand-muted ring-1 ring-line/80">
+        <span className="grid h-10 w-10 place-items-center bg-[#f5f5f5] text-ink">
           <Icon size={17} strokeWidth={1.8} />
         </span>
-        <span className="grid h-7 w-7 place-items-center rounded-full text-brand-faint transition group-hover:bg-cream-soft group-hover:text-ink">
+        <span className="grid h-7 w-7 place-items-center text-brand-faint transition-colors group-hover:bg-ink group-hover:text-white">
           <ArrowUpRight size={14} />
         </span>
       </div>
-      <p className="mt-5 text-[9.5px] font-semibold tracking-[0.13em] text-brand-faint uppercase">
+      <p className="mt-6 text-[8.5px] font-bold tracking-[0.18em] text-brand-faint uppercase">
         {label}
       </p>
-      <p className="mt-1.5 text-[32px] leading-none font-semibold tracking-[-0.045em] text-ink tabular-nums">
+      <p className="mt-1.5 text-[36px] leading-none font-semibold tracking-[-0.05em] text-ink tabular-nums">
         {value}
       </p>
       <p className="mt-2.5 truncate text-[11px] leading-relaxed text-muted">{detail}</p>
-      {delta && <div className="mt-2.5 border-t border-brand-hairline pt-2.5">{delta}</div>}
+      {delta && <div className="mt-3 border-t border-line pt-2.5">{delta}</div>}
     </Link>
   );
 }
@@ -124,18 +124,18 @@ export default function OverviewPage() {
             <Skeleton className="mt-3 h-8 w-72" />
             <Skeleton className="mt-3 h-3 w-96" />
           </div>
-          <Skeleton className="h-10 w-32 rounded-lg" />
+          <Skeleton className="h-10 w-32" />
         </div>
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {[0, 1, 2, 3].map((item) => (
-            <Skeleton key={item} className="h-[168px] rounded-xl" />
+            <Skeleton key={item} className="h-[168px]" />
           ))}
         </div>
         <div className="mt-4 grid gap-4 lg:grid-cols-[1.5fr_1fr]">
-          <Skeleton className="h-[330px] rounded-xl" />
-          <Skeleton className="h-[330px] rounded-xl" />
+          <Skeleton className="h-[330px]" />
+          <Skeleton className="h-[330px]" />
         </div>
-        {error && <p className="mt-4 text-[12px] text-[#5f574a]">The dashboard could not load. Check the API connection.</p>}
+        {error && <p className="mt-4 text-[12px] text-[#525252]">The dashboard could not load. Check the API connection.</p>}
       </div>
     );
   }
@@ -168,57 +168,55 @@ export default function OverviewPage() {
         }
       />
 
-      <section className="fade-up relative mb-4 overflow-hidden rounded-[12px] bg-ink px-5 py-5 text-white md:px-6">
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute -top-16 -right-10 h-48 w-48 rounded-full border border-white/10"
-        />
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute -right-20 -bottom-28 h-64 w-64 rounded-full border border-white/[0.07]"
-        />
-        <div className="relative flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-          <div className="max-w-2xl">
-            <p className="flex items-center gap-2 text-[9px] font-semibold tracking-[0.16em] text-white/55 uppercase">
-              <span className="h-1.5 w-1.5 rounded-full bg-white live-dot" />
+      <section className="fade-up relative mb-4 overflow-hidden border-2 border-ink bg-white">
+        <div className="grid lg:grid-cols-[1fr_300px]">
+          <div className="relative px-6 py-7 md:px-8">
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute top-0 right-0 h-full w-24 border-l border-line"
+            />
+            <p className="flex items-center gap-2 text-[8px] font-bold tracking-[0.22em] text-brand-faint uppercase">
+              <span className="h-1.5 w-1.5 bg-ink live-dot" />
               Today&apos;s focus
             </p>
-            <h2 className="font-display mt-2 text-[30px] leading-[1.02] font-semibold tracking-[-0.02em] md:text-[36px]">
+            <h2 className="font-display mt-3 max-w-2xl text-[34px] leading-[0.95] font-semibold tracking-[-0.03em] text-ink md:text-[42px]">
               {stats.newEnquiries > 0 || stats.unreadMessages > 0
                 ? "Keep every conversation moving."
                 : "Everything is clear for now."}
             </h2>
-            <p className="mt-2 max-w-xl text-[11.5px] leading-relaxed text-white/60">
+            <p className="mt-3 max-w-xl text-[11.5px] leading-relaxed text-muted">
               {stats.newEnquiries > 0 || stats.unreadMessages > 0
                 ? `${formatNumber(stats.newEnquiries)} new enquir${stats.newEnquiries === 1 ? "y" : "ies"} and ${formatNumber(stats.unreadMessages)} unread message${stats.unreadMessages === 1 ? "" : "s"} are waiting for your team.`
                 : "No enquiries need a first response and the inbox is clear. A good moment to refine the website or add a venue."}
             </p>
-            <div className="mt-4 flex flex-wrap gap-2">
+            <div className="mt-5 flex flex-wrap gap-2">
               <Link href="/enquiries?status=new">
-                <Button variant="secondary" size="sm" className="border-white/20 bg-white text-ink hover:border-white hover:bg-cream-soft">
+                <Button variant="primary" size="sm">
                   Review enquiries
                   <ArrowRight size={13} />
                 </Button>
               </Link>
               <Link href="/inbox">
-                <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
+                <Button variant="secondary" size="sm">
                   Open inbox
                 </Button>
               </Link>
             </div>
           </div>
-          <div className="grid shrink-0 grid-cols-2 divide-x divide-white/15 rounded-[9px] border border-white/15 bg-white/[0.055] px-2 py-3 md:min-w-[260px]">
-            <div className="px-4">
-              <p className="text-[8.5px] font-semibold tracking-[0.14em] text-white/45 uppercase">New leads</p>
-              <p className="mt-1.5 text-[26px] leading-none font-semibold tracking-[-0.04em] tabular-nums">
+          <div className="grid grid-cols-2 divide-x divide-line border-t border-line lg:border-t-0">
+            <div className="flex flex-col justify-between px-5 py-6">
+              <p className="text-[8px] font-bold tracking-[0.18em] text-brand-faint uppercase">New leads</p>
+              <p className="mt-6 text-[44px] leading-none font-semibold tracking-[-0.055em] tabular-nums text-ink">
                 {formatNumber(stats.newEnquiries)}
               </p>
+              <p className="mt-2 text-[9px] font-bold tracking-[0.12em] text-brand-faint uppercase">Awaiting reply</p>
             </div>
-            <div className="px-4">
-              <p className="text-[8.5px] font-semibold tracking-[0.14em] text-white/45 uppercase">Unread</p>
-              <p className="mt-1.5 text-[26px] leading-none font-semibold tracking-[-0.04em] tabular-nums">
+            <div className="flex flex-col justify-between px-5 py-6">
+              <p className="text-[8px] font-bold tracking-[0.18em] text-brand-faint uppercase">Unread</p>
+              <p className="mt-6 text-[44px] leading-none font-semibold tracking-[-0.055em] tabular-nums text-ink">
                 {formatNumber(stats.unreadMessages)}
               </p>
+              <p className="mt-2 text-[9px] font-bold tracking-[0.12em] text-brand-faint uppercase">Inbox queue</p>
             </div>
           </div>
         </div>
@@ -239,8 +237,8 @@ export default function OverviewPage() {
           value={formatNumber(stats.unreadMessages)}
           detail={`${stats.openThreads} open conversations`}
           delta={
-            <span className="inline-flex items-center gap-1 text-[11px] text-[#817665]">
-              <span className="h-1.5 w-1.5 rounded-full bg-ink live-dot" /> Realtime inbox
+            <span className="inline-flex items-center gap-1 text-[11px] text-[#6b6b6b]">
+              <span className="h-1.5 w-1.5  bg-ink live-dot" /> Realtime inbox
             </span>
           }
           href="/inbox"
@@ -251,7 +249,7 @@ export default function OverviewPage() {
           value={formatNumber(stats.liveVenues)}
           detail={`${stats.draftVenues} drafts in the catalogue`}
           delta={
-            <span className="inline-flex items-center gap-1 text-[11px] text-[#817665]">
+            <span className="inline-flex items-center gap-1 text-[11px] text-[#6b6b6b]">
               <Users size={10} /> {stats.publishedPosts} journal stories live
             </span>
           }
@@ -263,7 +261,7 @@ export default function OverviewPage() {
           value={`${stats.conversionRate}%`}
           detail={`${stats.wonEnquiries} enquiries won`}
           delta={
-            <span className="inline-flex items-center gap-1 text-[11px] text-[#817665]">
+            <span className="inline-flex items-center gap-1 text-[11px] text-[#6b6b6b]">
               <Clock3 size={10} />
               {stats.avgResponseHours !== null ? `${stats.avgResponseHours}h avg. first reply` : "No response data yet"}
             </span>
@@ -277,11 +275,11 @@ export default function OverviewPage() {
           <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
             <div>
               <h2 className="text-[13px] font-semibold text-ink">Enquiry volume</h2>
-              <p className="mt-0.5 text-[11px] text-[#817665]">Last 14 days</p>
+              <p className="mt-0.5 text-[11px] text-[#6b6b6b]">Last 14 days</p>
             </div>
-            <div className="flex items-center gap-3 text-[11px] text-[#817665]">
+            <div className="flex items-center gap-3 text-[11px] text-[#6b6b6b]">
               <span className="flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-full bg-ink" /> Enquiries
+                <span className="h-2 w-2  bg-ink" /> Enquiries
               </span>
               <span className="font-medium text-muted">{stats.weekEnquiries} this week</span>
             </div>
@@ -293,9 +291,9 @@ export default function OverviewPage() {
           <div className="flex items-start justify-between">
             <div>
               <h2 className="text-[13px] font-semibold text-ink">Lead status</h2>
-              <p className="mt-0.5 text-[11px] text-[#817665]">Current pipeline</p>
+              <p className="mt-0.5 text-[11px] text-[#6b6b6b]">Current pipeline</p>
             </div>
-            <Link href="/enquiries" className="text-[11px] text-[#817665] hover:text-ink hover:underline">
+            <Link href="/enquiries" className="text-[11px] text-[#6b6b6b] hover:text-ink hover:underline">
               View all
             </Link>
           </div>
@@ -305,11 +303,11 @@ export default function OverviewPage() {
             centerValue={stats.totalEnquiries}
             colors={data.statuses.map((row) => STATUS_COLORS[row.status] || "#e5e5e5")}
           />
-          <div className="grid grid-cols-2 gap-x-3 gap-y-2 border-t border-[#f0e9dd] pt-3">
+          <div className="grid grid-cols-2 gap-x-3 gap-y-2 border-t border-[#f0f0f0] pt-3">
             {data.statuses.slice(0, 4).map((row) => (
               <div key={row.status} className="flex items-center justify-between gap-2">
-                <span className="flex items-center gap-1.5 text-[11px] text-[#817665]">
-                  <span className="h-1.5 w-1.5 rounded-full" style={{ background: STATUS_COLORS[row.status] }} />
+                <span className="flex items-center gap-1.5 text-[11px] text-[#6b6b6b]">
+                  <span className="h-1.5 w-1.5 " style={{ background: STATUS_COLORS[row.status] }} />
                   {ENQUIRY_STATUS[row.status]?.label || row.status}
                 </span>
                 <span className="text-[11px] font-medium text-ink">{row.count}</span>
@@ -323,7 +321,7 @@ export default function OverviewPage() {
         <Card className="overflow-hidden">
           <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
             <h2 className="text-[13px] font-semibold text-ink">Recent enquiries</h2>
-            <Link href="/enquiries" className="flex items-center gap-1 text-[11px] text-[#817665] hover:text-ink hover:underline">
+            <Link href="/enquiries" className="flex items-center gap-1 text-[11px] text-[#6b6b6b] hover:text-ink hover:underline">
               View all <ArrowRight size={11} />
             </Link>
           </div>
@@ -353,7 +351,7 @@ export default function OverviewPage() {
                       </div>
                     </td>
                     <td>
-                      <p className="text-[11.5px] text-[#5f574a]">{enquiry.eventType || "Celebration"}</p>
+                      <p className="text-[11.5px] text-[#525252]">{enquiry.eventType || "Celebration"}</p>
                       <p className="text-[10.5px] text-muted">
                         {enquiry.guestCount || "—"} guests · {enquiry.eventDate || "date flexible"}
                       </p>
@@ -367,7 +365,7 @@ export default function OverviewPage() {
                     <td>
                       <Link
                         href={`/enquiries?focus=${enquiry.id}`}
-                        className="grid h-7 w-7 place-items-center rounded-full text-[#a79b88] transition group-hover:bg-cream-soft group-hover:text-[#5f574a]"
+                        className="grid h-7 w-7 place-items-center text-[#a3a3a3] transition-colors group-hover:bg-[#f5f5f5] group-hover:text-[#525252]"
                         aria-label={`Open ${enquiry.reference}`}
                       >
                         <ArrowRight size={13} />
@@ -389,7 +387,7 @@ export default function OverviewPage() {
           <Card className="p-5">
             <div>
               <h2 className="text-[13px] font-semibold text-ink">Lead sources</h2>
-              <p className="mt-0.5 text-[11px] text-[#817665]">Where enquiries come from</p>
+              <p className="mt-0.5 text-[11px] text-[#6b6b6b]">Where enquiries come from</p>
             </div>
             <div className="mt-4">
               <SourceBars data={sourceData} />
@@ -399,16 +397,16 @@ export default function OverviewPage() {
           <Card className="overflow-hidden">
             <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
               <h2 className="text-[13px] font-semibold text-ink">Recent activity</h2>
-              <Link href="/activity" className="text-[11px] text-[#817665] hover:text-ink hover:underline">
+              <Link href="/activity" className="text-[11px] text-[#6b6b6b] hover:text-ink hover:underline">
                 View all
               </Link>
             </div>
-            <div className="divide-y divide-[#f0e9dd]">
+            <div className="divide-y divide-[#f0f0f0]">
               {data.recentActivity.slice(0, 5).map((item) => {
                 const Icon = activityIcon(item.action);
                 return (
                   <div key={item.id} className="flex items-start gap-3 px-5 py-3">
-                    <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-cream-soft text-[#6f6556] ring-1 ring-line/70">
+                    <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center bg-[#f5f5f5] text-[#5f5f5f] ring-1 ring-line/70">
                       <Icon size={12} />
                     </span>
                     <div className="min-w-0 flex-1">

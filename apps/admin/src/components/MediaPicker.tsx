@@ -42,7 +42,7 @@ export function MediaPicker({
         {isLoading && !data && (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {Array.from({ length: 8 }).map((_, index) => (
-              <Skeleton key={index} className="aspect-[4/3] rounded-lg" />
+              <Skeleton key={index} className="aspect-[4/3] " />
             ))}
           </div>
         )}
@@ -63,9 +63,9 @@ export function MediaPicker({
                   onSelect(item.url, item);
                   onClose();
                 }}
-                className="group overflow-hidden rounded-lg border border-line bg-white text-left transition hover:border-ink"
+                className="group overflow-hidden  border border-line bg-white text-left transition-colors hover:border-ink"
               >
-                <span className="relative grid aspect-[4/3] place-items-center overflow-hidden bg-cream-soft">
+                <span className="relative grid aspect-[4/3] place-items-center overflow-hidden bg-[#f7f7f7]">
                   {item.kind === "video" ? (
                     <>
                       <video src={item.url} className="h-full w-full object-cover" muted preload="metadata" />
@@ -79,7 +79,7 @@ export function MediaPicker({
                 </span>
                 <span className="block px-2.5 py-2">
                   <span className="block truncate text-[10.5px] font-semibold text-ink">{item.originalName}</span>
-                  <span className="mt-0.5 block text-[9.5px] text-[#948771]">
+                  <span className="mt-0.5 block text-[9.5px] text-[#8a8a8a]">
                     {item.kind === "video" ? "Video" : "Image"}
                     {item.size > 0 ? ` · ${formatBytes(item.size)}` : ""}
                   </span>

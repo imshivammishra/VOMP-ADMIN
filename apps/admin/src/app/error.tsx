@@ -10,9 +10,9 @@ export default function ErrorPage({
   reset: () => void;
 }) {
   return (
-    <div className="grid min-h-screen place-items-center bg-canvas px-6">
-      <div className="w-full max-w-md rounded-[12px] border border-line bg-paper p-7 text-center shadow-[0_30px_80px_-60px_rgba(23,19,14,0.5)]">
-        <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-cream-soft text-brand-muted ring-1 ring-line">
+    <div className="grid min-h-screen place-items-center bg-white px-6">
+      <div className="w-full max-w-md  border border-line bg-white p-7 text-center ">
+        <span className="mx-auto grid h-12 w-12 place-items-center  bg-[#f7f7f7] text-brand-muted ring-1 ring-line">
           <TriangleAlert size={20} />
         </span>
         <p className="mt-5 text-[9px] font-semibold tracking-[0.16em] text-brand-faint uppercase">
@@ -26,14 +26,14 @@ export default function ErrorPage({
           API logs.
         </p>
         {error.digest && (
-          <p className="mt-3 rounded-md bg-cream-soft px-3 py-2 font-mono text-[10px] text-brand-faint">
+          <p className="mt-3  bg-[#f7f7f7] px-3 py-2 font-mono text-[10px] text-brand-faint">
             Reference: {error.digest}
           </p>
         )}
         <button
           type="button"
           onClick={reset}
-          className="mt-5 inline-flex h-10 items-center gap-2 rounded-md bg-ink px-4 text-[12px] font-semibold text-white transition hover:bg-[#2b251d]"
+          className="mt-5 inline-flex h-10 items-center gap-2  bg-ink px-4 text-[12px] font-semibold text-white transition-colors hover:bg-[#262626]"
         >
           <RefreshCw size={14} />
           Try again

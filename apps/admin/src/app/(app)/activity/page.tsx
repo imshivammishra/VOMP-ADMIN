@@ -35,15 +35,15 @@ const ENTITIES = [
 ];
 
 const ENTITY_STYLE: Record<string, { icon: typeof Activity; className: string }> = {
-  enquiry: { icon: MessageSquareText, className: "bg-cream-soft text-[#5f574a]" },
-  thread: { icon: Inbox, className: "bg-cream-soft text-[#5f574a]" },
-  partner: { icon: Star, className: "bg-cream-soft text-[#5f574a]" },
-  venue: { icon: Building2, className: "bg-cream-soft text-ink" },
+  enquiry: { icon: MessageSquareText, className: "bg-[#f7f7f7] text-[#525252]" },
+  thread: { icon: Inbox, className: "bg-[#f7f7f7] text-[#525252]" },
+  partner: { icon: Star, className: "bg-[#f7f7f7] text-[#525252]" },
+  venue: { icon: Building2, className: "bg-[#f7f7f7] text-ink" },
   post: { icon: BookOpen, className: "bg-ink text-white" },
-  media: { icon: ImageIcon, className: "bg-cream-soft text-[#5f574a]" },
-  user: { icon: Users, className: "bg-cream-soft text-[#5f574a]" },
-  settings: { icon: Settings, className: "bg-cream-soft text-muted" },
-  session: { icon: ShieldCheck, className: "bg-cream-soft text-[#5f574a]" },
+  media: { icon: ImageIcon, className: "bg-[#f7f7f7] text-[#525252]" },
+  user: { icon: Users, className: "bg-[#f7f7f7] text-[#525252]" },
+  settings: { icon: Settings, className: "bg-[#f7f7f7] text-muted" },
+  session: { icon: ShieldCheck, className: "bg-[#f7f7f7] text-[#525252]" },
 };
 
 function actionLabel(action: string) {
@@ -93,8 +93,8 @@ export default function ActivityPage() {
               type="button"
               onClick={() => setEntity(item.value)}
               className={cn(
-                "shrink-0 rounded-full px-2.5 py-1.5 text-[10.5px] font-semibold transition",
-                entity === item.value ? "bg-ink text-white" : "bg-white text-[#5f574a] ring-1 ring-ink/8 hover:text-ink"
+                "shrink-0  px-2.5 py-1.5 text-[10.5px] font-semibold transition-colors",
+                entity === item.value ? "bg-ink text-white" : "bg-white text-[#525252] ring-1 ring-ink/8 hover:text-ink"
               )}
             >
               {item.label}
@@ -103,7 +103,7 @@ export default function ActivityPage() {
         </div>
       </Card>
 
-      {!data && <div className="space-y-3">{[0, 1, 2, 3, 4, 5].map((row) => <Skeleton key={row} className="h-16 rounded-xl" />)}</div>}
+      {!data && <div className="space-y-3">{[0, 1, 2, 3, 4, 5].map((row) => <Skeleton key={row} className="h-16 " />)}</div>}
 
       {data && rows.length === 0 && (
         <Card><EmptyState icon={Activity} title="No activity found" description="Try clearing the search or choosing another area." /></Card>
@@ -113,31 +113,31 @@ export default function ActivityPage() {
         {grouped.map((group) => (
           <div key={group.day}>
             <div className="mb-2 flex items-center gap-3">
-              <p className="text-[9px] font-bold tracking-[0.18em] text-[#a79b88] uppercase">
+              <p className="text-[9px] font-bold tracking-[0.18em] text-[#a3a3a3] uppercase">
                 {group.day === new Date().toDateString()
                   ? "Today"
                   : new Intl.DateTimeFormat("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date(group.day))}
               </p>
               <span className="h-px flex-1 bg-ink/6" />
-              <span className="text-[9px] text-[#a79b88]">{group.items.length} events</span>
+              <span className="text-[9px] text-[#a3a3a3]">{group.items.length} events</span>
             </div>
             <Card className="overflow-hidden">
               <div className="divide-y divide-black/4">
                 {group.items.map((item) => {
-                  const style = ENTITY_STYLE[item.entity] || { icon: Activity, className: "bg-cream-soft text-[#5f574a]" };
+                  const style = ENTITY_STYLE[item.entity] || { icon: Activity, className: "bg-[#f7f7f7] text-[#525252]" };
                   const Icon = style.icon;
                   return (
-                    <div key={item.id} className="flex items-start gap-3 px-4 py-3.5 transition hover:bg-cream-soft">
-                      <span className={cn("mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-full", style.className)}>
+                    <div key={item.id} className="flex items-start gap-3 px-4 py-3.5 transition-colors hover:bg-[#f7f7f7]">
+                      <span className={cn("mt-0.5 grid h-8 w-8 shrink-0 place-items-center ", style.className)}>
                         <Icon size={14} />
                       </span>
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <p className="text-[11.5px] font-semibold text-ink">{actionLabel(item.action)}</p>
-                          <Badge className="bg-cream-soft text-muted ring-ink/6">{item.entity}</Badge>
+                          <Badge className="bg-[#f7f7f7] text-muted ring-ink/6">{item.entity}</Badge>
                         </div>
-                        <p className="mt-0.5 text-[11.5px] leading-relaxed text-[#5f574a]">{item.detail}</p>
-                        <p className="mt-1 flex items-center gap-1.5 text-[9.5px] text-[#a79b88]">
+                        <p className="mt-0.5 text-[11.5px] leading-relaxed text-[#525252]">{item.detail}</p>
+                        <p className="mt-1 flex items-center gap-1.5 text-[9.5px] text-[#a3a3a3]">
                           <Avatar name={item.actor} size="xs" className="h-4 w-4 text-[7px]" />
                           {item.actor} · {formatDateTime(item.createdAt)} · {timeAgo(item.createdAt)}
                         </p>

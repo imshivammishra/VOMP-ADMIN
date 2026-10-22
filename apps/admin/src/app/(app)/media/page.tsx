@@ -148,8 +148,8 @@ export default function MediaPage() {
       <div className="mb-4 grid gap-4 lg:grid-cols-[1.5fr_1fr]">
         <Card
           className={cn(
-            "relative flex min-h-[164px] cursor-pointer flex-col items-center justify-center overflow-hidden border-2 border-dashed p-6 text-center transition",
-            dragging ? "border-[#525252] bg-cream-soft" : "border-[#a3a3a3]/35 hover:border-[#525252]/60 hover:bg-cream-soft"
+            "relative flex min-h-[164px] cursor-pointer flex-col items-center justify-center overflow-hidden border-2 border-dashed p-6 text-center transition-colors",
+            dragging ? "border-[#525252] bg-[#f7f7f7]" : "border-[#a3a3a3]/35 hover:border-[#525252]/60 hover:bg-[#f7f7f7]"
           )}
           onClick={() => inputRef.current?.click()}
           onDragOver={(event) => { event.preventDefault(); setDragging(true); }}
@@ -163,7 +163,7 @@ export default function MediaPage() {
             className="hidden"
             onChange={(event) => uploadFiles(event.target.files)}
           />
-          <span className="grid h-12 w-12 place-items-center rounded-full bg-cream-soft text-[#5f574a] ring-1 ring-[#a3a3a3]/25">
+          <span className="grid h-12 w-12 place-items-center  bg-[#f7f7f7] text-[#525252] ring-1 ring-[#a3a3a3]/25">
             {uploading ? <Loader2 size={20} className="animate-spin" /> : <UploadCloud size={20} />}
           </span>
           <p className="mt-3 text-[13px] font-semibold text-ink">
@@ -174,19 +174,19 @@ export default function MediaPage() {
 
         <div className="grid grid-cols-2 gap-4">
           <Card className="p-4">
-            <p className="text-[9px] font-bold tracking-[0.16em] text-[#5f574a] uppercase">Library</p>
+            <p className="text-[9px] font-bold tracking-[0.16em] text-[#525252] uppercase">Library</p>
             <p className="font-display mt-1 text-[34px] leading-none font-semibold text-ink">{data?.meta?.total || 0}</p>
             <p className="mt-1.5 text-[10.5px] text-muted">files stored</p>
           </Card>
           <Card className="p-4">
-            <p className="text-[9px] font-bold tracking-[0.16em] text-[#5f574a] uppercase">This page</p>
+            <p className="text-[9px] font-bold tracking-[0.16em] text-[#525252] uppercase">This page</p>
             <p className="font-display mt-1 text-[34px] leading-none font-semibold text-ink">{totalBytes > 0 ? formatBytes(totalBytes) : "—"}</p>
             <p className="mt-1.5 text-[10.5px] text-muted">across {items.length} files</p>
           </Card>
           <Card className="col-span-2 p-4">
-            <p className="flex items-center gap-1.5 text-[9px] font-bold tracking-[0.16em] text-[#5f574a] uppercase"><Images size={11} /> How it works</p>
+            <p className="flex items-center gap-1.5 text-[9px] font-bold tracking-[0.16em] text-[#525252] uppercase"><Images size={11} /> How it works</p>
             <p className="mt-1.5 text-[11px] leading-relaxed text-muted">
-              Uploaded files are served from the API&apos;s <code className="rounded bg-cream-soft px-1">/uploads</code> path and proxied by both domains in production. Use the copied URL in any image or video field.
+              Uploaded files are served from the API&apos;s <code className=" bg-[#f7f7f7] px-1">/uploads</code> path and proxied by both domains in production. Use the copied URL in any image or video field.
             </p>
           </Card>
         </div>
@@ -204,24 +204,24 @@ export default function MediaPage() {
 
       {!data && (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
-          {[0, 1, 2, 3, 4, 5, 6, 7].map((item) => <Skeleton key={item} className="h-[210px] rounded-xl" />)}
+          {[0, 1, 2, 3, 4, 5, 6, 7].map((item) => <Skeleton key={item} className="h-[210px] " />)}
         </div>
       )}
 
       {data && items.length > 0 && (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
           {items.map((item) => (
-            <Card key={item.id} className="group overflow-hidden transition hover:-translate-y-0.5 hover:border-line">
-              <button type="button" onClick={() => { setDetail(item); setAlt(item.alt); }} className="relative block aspect-[4/3] w-full overflow-hidden bg-cream">
+            <Card key={item.id} className="group overflow-hidden transition-colors hover:border-line">
+              <button type="button" onClick={() => { setDetail(item); setAlt(item.alt); }} className="relative block aspect-[4/3] w-full overflow-hidden bg-[#f0f0f0]">
                 {item.kind === "video" ? (
                   <>
                     <video src={item.url} className="h-full w-full object-cover" muted preload="metadata" />
                     <span className="absolute inset-0 grid place-items-center bg-ink/25 text-white"><Video size={24} /></span>
                   </>
                 ) : (
-                  <img src={item.url} alt={item.alt || item.originalName} className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" loading="lazy" />
+                  <img src={item.url} alt={item.alt || item.originalName} className="h-full w-full object-cover" loading="lazy" decoding="async" />
                 )}
-                <span className="absolute top-2 right-2 rounded-full bg-ink/55 px-2 py-0.5 text-[8.5px] font-semibold text-white">
+                <span className="absolute top-2 right-2  bg-ink/55 px-2 py-0.5 text-[8.5px] font-semibold text-white">
                   {item.kind === "video" ? "video" : item.size > 0 ? formatBytes(item.size) : "image"}
                 </span>
               </button>
@@ -229,12 +229,12 @@ export default function MediaPage() {
                 <p className="truncate text-[11px] font-semibold text-ink" title={item.originalName}>{item.originalName}</p>
                 <p className="mt-0.5 truncate text-[9.5px] text-muted">{item.alt || "No alt text"}</p>
                 <div className="mt-2 flex items-center justify-between border-t border-ink/5 pt-2">
-                  <span className="text-[8.5px] text-[#a79b88]">{formatDate(item.createdAt)}</span>
+                  <span className="text-[8.5px] text-[#a3a3a3]">{formatDate(item.createdAt)}</span>
                   <div className="flex items-center gap-0.5">
                     <button
                       type="button"
                       onClick={() => copyText(item.url).then(() => toast(item.kind === "video" ? "Video URL copied" : "Image URL copied")).catch(() => toast("Could not copy URL", { tone: "error" }))}
-                      className="grid h-7 w-7 place-items-center rounded-full text-muted hover:bg-cream-soft hover:text-[#5f574a]"
+                      className="grid h-7 w-7 place-items-center  text-muted hover:bg-[#f7f7f7] hover:text-[#525252]"
                       title="Copy URL"
                     >
                       <Copy size={12} />
@@ -242,7 +242,7 @@ export default function MediaPage() {
                     <button
                       type="button"
                       onClick={() => setDeleteTarget(item)}
-                      className="grid h-7 w-7 place-items-center rounded-full text-[#a79b88] hover:bg-cream-soft hover:text-ink"
+                      className="grid h-7 w-7 place-items-center  text-[#a3a3a3] hover:bg-[#f7f7f7] hover:text-ink"
                       title="Delete"
                     >
                       <Trash2 size={12} />
@@ -278,7 +278,7 @@ export default function MediaPage() {
         size="md"
         footer={detail ? (
           <div className="flex items-center justify-between">
-            <Button variant="ghost" size="sm" icon={Trash2} className="text-[#817665] hover:bg-cream-soft hover:text-ink" onClick={() => setDeleteTarget(detail)}>Delete</Button>
+            <Button variant="ghost" size="sm" icon={Trash2} className="text-[#6b6b6b] hover:bg-[#f7f7f7] hover:text-ink" onClick={() => setDeleteTarget(detail)}>Delete</Button>
             <div className="flex gap-2">
               <Button variant="secondary" size="sm" icon={Copy} onClick={() => copyText(detail.url).then(() => toast(detail.kind === "video" ? "Video URL copied" : "Image URL copied"))}>Copy URL</Button>
               <Button variant="primary" size="sm" icon={Check} loading={saving} onClick={saveAlt}>Save description</Button>
@@ -288,7 +288,7 @@ export default function MediaPage() {
       >
         {detail && (
           <div className="space-y-4 p-5">
-            <div className="overflow-hidden rounded-xl border border-ink/8 bg-cream">
+            <div className="overflow-hidden  border border-ink/8 bg-[#f0f0f0]">
               {detail.kind === "video" ? (
                 <video src={detail.url} controls className="max-h-[340px] w-full bg-ink object-contain" />
               ) : (
@@ -312,12 +312,12 @@ export default function MediaPage() {
             <Field label="Description / alt text" hint="Describe the file for accessibility and search engines.">
               <Input value={alt} onChange={(event) => setAlt(event.target.value)} placeholder={detail.kind === "video" ? "A short wedding film from a palace venue" : "A palace courtyard set for a wedding at golden hour"} />
             </Field>
-            <div className="grid grid-cols-2 gap-3 rounded-xl bg-cream-soft p-3">
-              <div><p className="text-[9px] font-bold tracking-[0.1em] text-[#a79b88] uppercase">Type</p><p className="mt-1 text-[11px] font-semibold text-ink">{detail.mime}</p></div>
-              <div><p className="text-[9px] font-bold tracking-[0.1em] text-[#a79b88] uppercase">Uploaded by</p><p className="mt-1 text-[11px] font-semibold text-ink">{detail.uploadedBy}</p></div>
+            <div className="grid grid-cols-2 gap-3  bg-[#f7f7f7] p-3">
+              <div><p className="text-[9px] font-bold tracking-[0.1em] text-[#a3a3a3] uppercase">Type</p><p className="mt-1 text-[11px] font-semibold text-ink">{detail.mime}</p></div>
+              <div><p className="text-[9px] font-bold tracking-[0.1em] text-[#a3a3a3] uppercase">Uploaded by</p><p className="mt-1 text-[11px] font-semibold text-ink">{detail.uploadedBy}</p></div>
             </div>
-            <div className="rounded-xl border border-line bg-cream-soft p-3 text-[10.5px] leading-relaxed text-muted">
-              <Badge className="mr-1.5 bg-white text-[#5f574a] ring-[#a3a3a3]/25">Tip</Badge>
+            <div className=" border border-line bg-[#f7f7f7] p-3 text-[10.5px] leading-relaxed text-muted">
+              <Badge className="mr-1.5 bg-white text-[#525252] ring-[#a3a3a3]/25">Tip</Badge>
               Use this URL in page content, venues, destinations or journal stories. The public site serves the same file from its own domain.
             </div>
           </div>

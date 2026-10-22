@@ -33,20 +33,20 @@
 }
 
 @theme {
-  --color-canvas: #f3ede3;
-  --color-cream: #ece3d4;
-  --color-cream-soft: #f8f4ec;
+  --color-canvas: #ffffff;
+  --color-cream: #f2f2f2;
+  --color-cream-soft: #f7f7f7;
   --color-paper: #ffffff;
-  --color-ink: #17130e;
-  --color-muted: #766c5c;
-  --color-line: #ded4c4;
-  --color-line-strong: #cbbda8;
-  --color-brand-panel: #f8f3ea;
-  --color-brand-line: #ddd3c3;
-  --color-brand-line-strong: #c5b69f;
-  --color-brand-muted: #675d4f;
-  --color-brand-faint: #978a76;
-  --color-brand-hairline: #f0e9dd;
+  --color-ink: #090909;
+  --color-muted: #666666;
+  --color-line: #e2e2e2;
+  --color-line-strong: #bdbdbd;
+  --color-brand-panel: #ffffff;
+  --color-brand-line: #e8e8e8;
+  --color-brand-line-strong: #c4c4c4;
+  --color-brand-muted: #555555;
+  --color-brand-faint: #8a8a8a;
+  --color-brand-hairline: #f0f0f0;
   --font-display: "Cormorant", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 }
@@ -62,13 +62,20 @@ html {
 }
 
 body {
-  background-color: var(--color-canvas);
-  background-image: radial-gradient(rgba(23, 19, 14, 0.035) 0.55px, transparent 0.65px);
-  background-size: 5px 5px;
+  background-color: #ffffff;
+  background-image: none;
   color: var(--color-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
   letter-spacing: -0.008em;
+}
+
+/* Hard editorial surfaces: hairline borders, no blur or soft glow. */
+.surface {
+  background: #ffffff;
+  border: 1px solid var(--color-line);
+  box-shadow: none;
 }
 
 ::selection {
@@ -94,33 +101,23 @@ button {
   letter-spacing: -0.018em;
 }
 
-/* Warm paper surfaces */
-.surface {
-  background: var(--color-paper);
-  border: 1px solid var(--color-line);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.9) inset,
-    0 18px 42px -40px rgba(23, 19, 14, 0.45);
-}
-
 .sidebar-surface {
-  background: var(--color-cream);
+  background: #ffffff;
 }
 
 .scrollbar-thin {
   scrollbar-width: thin;
-  scrollbar-color: rgba(23, 19, 14, 0.2) transparent;
+  scrollbar-color: rgba(0, 0, 0, 0.22) transparent;
 }
 .scrollbar-thin::-webkit-scrollbar {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
 }
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: rgba(23, 19, 14, 0.18);
-  border-radius: 99px;
+  background: rgba(0, 0, 0, 0.2);
 }
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: rgba(23, 19, 14, 0.34);
+  background: rgba(0, 0, 0, 0.38);
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -140,8 +137,8 @@ button {
 .skeleton {
   position: relative;
   overflow: hidden;
-  background: #e9e0d2;
-  border-radius: 8px;
+  background: #f0f0f0;
+  border-radius: 0;
 }
 .skeleton::after {
   content: "";
@@ -163,7 +160,7 @@ button {
   }
 }
 .fade-up {
-  animation: fade-up 0.38s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation: fade-up 0.28s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 
 @keyframes toast-in {
@@ -211,14 +208,14 @@ button {
 @keyframes live-pulse {
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgba(23, 19, 14, 0.22);
+    opacity: 1;
   }
   60% {
-    box-shadow: 0 0 0 5px rgba(23, 19, 14, 0);
+    opacity: 0.35;
   }
 }
 .live-dot {
-  animation: live-pulse 2.2s ease-out infinite;
+  animation: live-pulse 2.6s ease-in-out infinite;
 }
 
 /* Table polish */
@@ -231,20 +228,21 @@ button {
   position: sticky;
   top: 0;
   z-index: 1;
-  background: #fbf7ef;
-  color: #817665;
-  font-size: 9.5px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
+  background: #ffffff;
+  color: #777777;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   text-align: left;
-  padding: 11px 16px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--color-ink);
   border-bottom: 1px solid var(--color-line);
   white-space: nowrap;
 }
 .data-table td {
-  padding: 13px 16px;
-  border-bottom: 1px solid #f0e9dd;
+  padding: 14px 16px;
+  border-bottom: 1px solid #efefef;
   vertical-align: middle;
   font-size: 13px;
 }
@@ -252,7 +250,7 @@ button {
   transition: background-color 0.15s ease;
 }
 .data-table tbody tr:hover {
-  background: #fcf9f3;
+  background: #fafafa;
 }
 .data-table tbody tr:last-child td {
   border-bottom: 0;

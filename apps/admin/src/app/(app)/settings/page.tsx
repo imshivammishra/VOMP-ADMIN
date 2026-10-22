@@ -66,14 +66,14 @@ function StatusDot({ status }: { status: string }) {
   return (
     <span
       className={cn(
-        "h-2 w-2 rounded-full",
+        "h-2 w-2 ",
         status === "online" || status === "healthy"
           ? "bg-ink live-dot"
           : status === "degraded"
-            ? "bg-[#b1a48f]"
+            ? "bg-[#a3a3a3]"
             : status === "offline"
-              ? "bg-[#817665]"
-              : "bg-[#d7ccba]"
+              ? "bg-[#6b6b6b]"
+              : "bg-[#d4d4d4]"
       )}
     />
   );
@@ -178,8 +178,8 @@ export default function SettingsPage() {
       <div>
         <Skeleton className="h-20 w-2/3" />
         <div className="mt-5 grid gap-4 lg:grid-cols-[1.5fr_1fr]">
-          <Skeleton className="h-[430px] rounded-xl" />
-          <Skeleton className="h-[430px] rounded-xl" />
+          <Skeleton className="h-[430px] " />
+          <Skeleton className="h-[430px] " />
         </div>
       </div>
     );
@@ -218,7 +218,7 @@ export default function SettingsPage() {
       {tab === "general" && (
         <div className="grid gap-4 lg:grid-cols-[1.55fr_1fr]">
           <Card className="p-5">
-            <p className="text-[9.5px] font-bold tracking-[0.18em] text-[#5f574a] uppercase">Brand identity</p>
+            <p className="text-[9.5px] font-bold tracking-[0.18em] text-[#525252] uppercase">Brand identity</p>
             <h2 className="font-display mt-0.5 text-[27px] leading-none font-semibold text-ink">Public details</h2>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               <Field label="Brand name"><Input value={form.general.brandName} onChange={(event) => setForm({ ...form, general: { ...form.general, brandName: event.target.value } })} /></Field>
@@ -236,12 +236,12 @@ export default function SettingsPage() {
 
           <div className="space-y-4">
             <Card className="p-5">
-              <p className="text-[9.5px] font-bold tracking-[0.18em] text-[#5f574a] uppercase">Brand preview</p>
-              <div className="mt-3 rounded-xl border border-line bg-white p-5 text-ink">
+              <p className="text-[9.5px] font-bold tracking-[0.18em] text-[#525252] uppercase">Brand preview</p>
+              <div className="mt-3  border border-line bg-white p-5 text-ink">
                 <p className="font-display text-[24px] leading-none font-semibold tracking-[0.05em]">VENUE</p>
-                <p className="mt-1.5 text-[8px] font-bold tracking-[0.26em] text-[#817665]">ON MY PLATE</p>
-                <p className="mt-4 text-[11px] text-[#817665]">{form.general.tagline}</p>
-                <div className="mt-4 border-t border-[#f0e9dd] pt-3 text-[10px] text-[#948771]">
+                <p className="mt-1.5 text-[8px] font-bold tracking-[0.26em] text-[#6b6b6b]">ON MY PLATE</p>
+                <p className="mt-4 text-[11px] text-[#6b6b6b]">{form.general.tagline}</p>
+                <div className="mt-4 border-t border-[#f0f0f0] pt-3 text-[10px] text-[#8a8a8a]">
                   <p>{form.general.email}</p>
                   <p>{form.general.phone}</p>
                   <p>{form.general.hours}</p>
@@ -252,10 +252,10 @@ export default function SettingsPage() {
               </p>
             </Card>
             <Card className="p-5">
-              <p className="flex items-center gap-1.5 text-[9px] font-bold tracking-[0.14em] text-[#5f574a] uppercase"><ShieldCheck size={11} /> Signed in as</p>
+              <p className="flex items-center gap-1.5 text-[9px] font-bold tracking-[0.14em] text-[#525252] uppercase"><ShieldCheck size={11} /> Signed in as</p>
               <p className="mt-2 text-[13px] font-semibold text-ink">{user?.name}</p>
               <p className="text-[11px] text-muted">{user?.email}</p>
-              <Badge className="mt-2 bg-cream-soft text-[#5f574a] ring-[#a3a3a3]/25">{user?.role}</Badge>
+              <Badge className="mt-2 bg-[#f7f7f7] text-[#525252] ring-[#a3a3a3]/25">{user?.role}</Badge>
             </Card>
           </div>
         </div>
@@ -270,10 +270,10 @@ export default function SettingsPage() {
               ["Admin console", connections?.domains?.admin || form.api.adminUrl, "Private workspace"],
             ].map(([label, value, note]) => (
               <Card key={label} className="p-4">
-                <p className="text-[9px] font-bold tracking-[0.14em] text-[#5f574a] uppercase">{label}</p>
+                <p className="text-[9px] font-bold tracking-[0.14em] text-[#525252] uppercase">{label}</p>
                 <p className="mt-1.5 truncate text-[12px] font-semibold text-ink" title={value}>{value}</p>
                 <p className="mt-0.5 text-[10px] text-muted">{note}</p>
-                <button type="button" onClick={() => copyText(value).then(() => toast("URL copied"))} className="mt-2.5 flex items-center gap-1 text-[10px] font-semibold text-[#5f574a] hover:underline"><Copy size={10} /> Copy</button>
+                <button type="button" onClick={() => copyText(value).then(() => toast("URL copied"))} className="mt-2.5 flex items-center gap-1 text-[10px] font-semibold text-[#525252] hover:underline"><Copy size={10} /> Copy</button>
               </Card>
             ))}
           </div>
@@ -282,7 +282,7 @@ export default function SettingsPage() {
             <Card className="overflow-hidden">
               <div className="flex items-center justify-between border-b border-ink/6 px-5 py-4">
                 <div>
-                  <p className="text-[9.5px] font-bold tracking-[0.18em] text-[#5f574a] uppercase">Live diagnostics</p>
+                  <p className="text-[9.5px] font-bold tracking-[0.18em] text-[#525252] uppercase">Live diagnostics</p>
                   <h2 className="font-display mt-0.5 text-[26px] leading-none font-semibold text-ink">Connections</h2>
                 </div>
                 <Button variant="secondary" size="sm" icon={RefreshCw} onClick={() => mutateConnections()} loading={checking}>Recheck</Button>
@@ -292,14 +292,14 @@ export default function SettingsPage() {
                   const Icon = SERVICE_ICONS[service.key] || Server;
                   return (
                     <div key={service.key} className="flex items-center gap-3 px-5 py-3">
-                      <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-cream-soft text-[#5f574a]"><Icon size={14} /></span>
+                      <span className="grid h-8 w-8 shrink-0 place-items-center  bg-[#f7f7f7] text-[#525252]"><Icon size={14} /></span>
                       <div className="min-w-0 flex-1">
                         <p className="flex items-center gap-1.5 text-[11.5px] font-semibold text-ink"><StatusDot status={service.status} /> {service.label}</p>
                         <p className="truncate text-[10px] text-muted">{service.host || service.message}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-[9.5px] font-semibold text-[#5f574a]">{service.status}</p>
-                        <p className="text-[9px] text-[#a79b88]">{service.latencyMs}ms</p>
+                        <p className="text-[9.5px] font-semibold text-[#525252]">{service.status}</p>
+                        <p className="text-[9px] text-[#a3a3a3]">{service.latencyMs}ms</p>
                       </div>
                     </div>
                   );
@@ -310,7 +310,7 @@ export default function SettingsPage() {
 
             <div className="space-y-4">
               <Card className="p-5">
-                <p className="text-[9.5px] font-bold tracking-[0.18em] text-[#5f574a] uppercase">Public API</p>
+                <p className="text-[9.5px] font-bold tracking-[0.18em] text-[#525252] uppercase">Public API</p>
                 <div className="mt-2 space-y-2">
                   {[
                     ["Enquiries", "/api/v1/public/enquiries"],
@@ -320,21 +320,21 @@ export default function SettingsPage() {
                     ["Journal", "/api/v1/public/blogs"],
                     ["Partners", "/api/v1/public/partners"],
                   ].map(([label, path]) => (
-                    <div key={path} className="flex items-center justify-between gap-2 rounded-lg bg-cream-soft px-2.5 py-1.5">
-                      <span className="text-[10.5px] font-medium text-[#5f574a]">{label}</span>
-                      <code className="text-[9px] text-[#5f574a]">{path}</code>
+                    <div key={path} className="flex items-center justify-between gap-2  bg-[#f7f7f7] px-2.5 py-1.5">
+                      <span className="text-[10.5px] font-medium text-[#525252]">{label}</span>
+                      <code className="text-[9px] text-[#525252]">{path}</code>
                     </div>
                   ))}
                 </div>
               </Card>
 
               <Card className="p-5">
-                <p className="text-[9.5px] font-bold tracking-[0.18em] text-[#5f574a] uppercase">Website environment</p>
-                <pre className="scrollbar-thin mt-2 overflow-x-auto rounded-lg bg-ink p-3 text-[9.5px] leading-relaxed text-[#d4d4d4]">{websiteEnv}</pre>
+                <p className="text-[9.5px] font-bold tracking-[0.18em] text-[#525252] uppercase">Website environment</p>
+                <pre className="scrollbar-thin mt-2 overflow-x-auto  bg-ink p-3 text-[9.5px] leading-relaxed text-[#d4d4d4]">{websiteEnv}</pre>
                 <button
                   type="button"
                   onClick={() => copyText(websiteEnv).then(() => toast("Environment copied"))}
-                  className="mt-2 flex items-center gap-1 text-[10px] font-semibold text-[#5f574a] hover:underline"
+                  className="mt-2 flex items-center gap-1 text-[10px] font-semibold text-[#525252] hover:underline"
                 >
                   <Copy size={10} /> Copy variables
                 </button>
@@ -347,25 +347,25 @@ export default function SettingsPage() {
 
           <div className="grid gap-4 lg:grid-cols-2">
             <Card className="p-5">
-              <p className="flex items-center gap-1.5 text-[9.5px] font-bold tracking-[0.18em] text-[#5f574a] uppercase"><Database size={11} /> Storage & runtime</p>
+              <p className="flex items-center gap-1.5 text-[9.5px] font-bold tracking-[0.18em] text-[#525252] uppercase"><Database size={11} /> Storage & runtime</p>
               <div className="mt-3 grid grid-cols-2 gap-3 text-[11px]">
-                <div><p className="text-[9px] tracking-[0.1em] text-[#a79b88] uppercase">Database</p><p className="mt-1 font-semibold text-ink">{formatBytes(connections?.database.bytes || 0)}</p><p className="text-[9.5px] text-muted">quick_check: {connections?.database.quickCheck || "…"}</p></div>
-                <div><p className="text-[9px] tracking-[0.1em] text-[#a79b88] uppercase">Media storage</p><p className="mt-1 font-semibold text-ink">{formatBytes(connections?.storage.bytes || 0)}</p><p className="text-[9.5px] text-muted">{connections?.storage.files || 0} files</p></div>
-                <div><p className="text-[9px] tracking-[0.1em] text-[#a79b88] uppercase">Node runtime</p><p className="mt-1 font-semibold text-ink">{connections?.runtime.node || environment?.node || "—"}</p><p className="text-[9.5px] text-muted">{connections?.runtime.platform}</p></div>
-                <div><p className="text-[9px] tracking-[0.1em] text-[#a79b88] uppercase">Uptime</p><p className="mt-1 font-semibold text-ink">{Math.floor((connections?.runtime.uptimeSeconds || 0) / 60)}m</p><p className="text-[9.5px] text-muted">RSS {connections?.runtime.rssMb || 0} MB</p></div>
+                <div><p className="text-[9px] tracking-[0.1em] text-[#a3a3a3] uppercase">Database</p><p className="mt-1 font-semibold text-ink">{formatBytes(connections?.database.bytes || 0)}</p><p className="text-[9.5px] text-muted">quick_check: {connections?.database.quickCheck || "…"}</p></div>
+                <div><p className="text-[9px] tracking-[0.1em] text-[#a3a3a3] uppercase">Media storage</p><p className="mt-1 font-semibold text-ink">{formatBytes(connections?.storage.bytes || 0)}</p><p className="text-[9.5px] text-muted">{connections?.storage.files || 0} files</p></div>
+                <div><p className="text-[9px] tracking-[0.1em] text-[#a3a3a3] uppercase">Node runtime</p><p className="mt-1 font-semibold text-ink">{connections?.runtime.node || environment?.node || "—"}</p><p className="text-[9.5px] text-muted">{connections?.runtime.platform}</p></div>
+                <div><p className="text-[9px] tracking-[0.1em] text-[#a3a3a3] uppercase">Uptime</p><p className="mt-1 font-semibold text-ink">{Math.floor((connections?.runtime.uptimeSeconds || 0) / 60)}m</p><p className="text-[9.5px] text-muted">RSS {connections?.runtime.rssMb || 0} MB</p></div>
               </div>
             </Card>
 
             <Card className="p-5">
-              <p className="flex items-center gap-1.5 text-[9.5px] font-bold tracking-[0.18em] text-[#5f574a] uppercase"><Globe2 size={11} /> CORS allowlist</p>
+              <p className="flex items-center gap-1.5 text-[9.5px] font-bold tracking-[0.18em] text-[#525252] uppercase"><Globe2 size={11} /> CORS allowlist</p>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {(connections?.domains.origins || form.api.corsOrigins).map((origin) => (
-                  <Badge key={origin} className="bg-cream-soft text-[#5f574a] ring-ink/6">{origin}</Badge>
+                  <Badge key={origin} className="bg-[#f7f7f7] text-[#525252] ring-ink/6">{origin}</Badge>
                 ))}
               </div>
               <p className="mt-3 text-[10.5px] leading-relaxed text-muted">
-                Configured in the API <code className="rounded bg-cream-soft px-1">CORS_ORIGINS</code> environment. The cookie domain is{" "}
-                <span className="font-semibold text-[#5f574a]">{connections?.domains.cookieDomain || "host-only"}</span>.
+                Configured in the API <code className=" bg-[#f7f7f7] px-1">CORS_ORIGINS</code> environment. The cookie domain is{" "}
+                <span className="font-semibold text-[#525252]">{connections?.domains.cookieDomain || "host-only"}</span>.
               </p>
               {environment && (
                 <div className="mt-3 grid gap-1.5 border-t border-ink/5 pt-3 text-[10.5px]">
@@ -384,7 +384,7 @@ export default function SettingsPage() {
         <div className="grid gap-4 lg:grid-cols-[1fr_1.1fr]">
           <div className="space-y-4">
             <Card className="p-5">
-              <p className="flex items-center gap-1.5 text-[9.5px] font-bold tracking-[0.18em] text-[#5f574a] uppercase"><KeyRound size={11} /> Password</p>
+              <p className="flex items-center gap-1.5 text-[9.5px] font-bold tracking-[0.18em] text-[#525252] uppercase"><KeyRound size={11} /> Password</p>
               <h2 className="font-display mt-0.5 text-[27px] leading-none font-semibold text-ink">Change your password</h2>
               <div className="mt-4 space-y-3">
                 <Field label="Current password"><Input type="password" value={password.currentPassword} onChange={(event) => setPassword({ ...password, currentPassword: event.target.value })} autoComplete="current-password" /></Field>
@@ -395,38 +395,38 @@ export default function SettingsPage() {
             </Card>
 
             <Card className="p-5">
-              <p className="text-[9.5px] font-bold tracking-[0.18em] text-[#5f574a] uppercase">Policy</p>
+              <p className="text-[9.5px] font-bold tracking-[0.18em] text-[#525252] uppercase">Policy</p>
               <div className="mt-3 divide-y divide-black/5 text-[11px]">
                 <div className="flex items-start justify-between gap-4 py-3">
                   <div>
                     <p className="font-semibold text-ink">Sign-in alerts</p>
                     <p className="mt-1 leading-relaxed text-muted">Every successful sign-in is recorded in the activity log with its IP address.</p>
                   </div>
-                  <Badge className="bg-cream-soft text-[#5f574a] ring-[#a3a3a3]/25">Always on</Badge>
+                  <Badge className="bg-[#f7f7f7] text-[#525252] ring-[#a3a3a3]/25">Always on</Badge>
                 </div>
                 <div className="flex items-start justify-between gap-4 py-3">
                   <div>
                     <p className="font-semibold text-ink">Password minimum</p>
                     <p className="mt-1 leading-relaxed text-muted">Ten characters, enforced for every new account and password change.</p>
                   </div>
-                  <Badge className="bg-cream-soft text-[#5f574a] ring-[#a3a3a3]/25">10+ chars</Badge>
+                  <Badge className="bg-[#f7f7f7] text-[#525252] ring-[#a3a3a3]/25">10+ chars</Badge>
                 </div>
                 <div className="flex items-start justify-between gap-4 py-3">
                   <div>
                     <p className="font-semibold text-ink">Session lifetime</p>
                     <p className="mt-1 leading-relaxed text-muted">
                       {environment?.flags.sessionHours ?? form.security.sessionHours} hours. Change{" "}
-                      <code className="rounded bg-cream-soft px-1">SESSION_HOURS</code> in the API environment and restart the service.
+                      <code className=" bg-[#f7f7f7] px-1">SESSION_HOURS</code> in the API environment and restart the service.
                     </p>
                   </div>
-                  <Badge className="bg-cream-soft text-[#5f574a] ring-[#a3a3a3]/25">{environment?.flags.sessionHours ?? form.security.sessionHours}h</Badge>
+                  <Badge className="bg-[#f7f7f7] text-[#525252] ring-[#a3a3a3]/25">{environment?.flags.sessionHours ?? form.security.sessionHours}h</Badge>
                 </div>
                 <div className="flex items-start justify-between gap-4 py-3">
                   <div>
                     <p className="font-semibold text-ink">Secure cookies</p>
                     <p className="mt-1 leading-relaxed text-muted">HttpOnly, SameSite=Lax and Secure in production, set automatically.</p>
                   </div>
-                  <Badge className="bg-cream-soft text-[#5f574a] ring-[#a3a3a3]/25">Enforced</Badge>
+                  <Badge className="bg-[#f7f7f7] text-[#525252] ring-[#a3a3a3]/25">Enforced</Badge>
                 </div>
               </div>
             </Card>
@@ -436,7 +436,7 @@ export default function SettingsPage() {
             <Card className="overflow-hidden">
               <div className="flex items-center justify-between border-b border-ink/6 px-5 py-4">
                 <div>
-                  <p className="text-[9.5px] font-bold tracking-[0.18em] text-[#5f574a] uppercase">Active sessions</p>
+                  <p className="text-[9.5px] font-bold tracking-[0.18em] text-[#525252] uppercase">Active sessions</p>
                   <h2 className="font-display mt-0.5 text-[26px] leading-none font-semibold text-ink">Where you are signed in</h2>
                 </div>
                 <Button variant="secondary" size="sm" icon={RefreshCw} onClick={() => mutateSessions()}>Refresh</Button>
@@ -444,16 +444,16 @@ export default function SettingsPage() {
               <div className="divide-y divide-black/5">
                 {(sessions || []).map((session) => (
                   <div key={session.id} className="flex items-center gap-3 px-5 py-3.5">
-                    <span className={cn("grid h-8 w-8 shrink-0 place-items-center rounded-full", session.current ? "bg-cream-soft text-[#5f574a]" : "bg-cream-soft text-muted")}><Laptop size={14} /></span>
+                    <span className={cn("grid h-8 w-8 shrink-0 place-items-center ", session.current ? "bg-[#f7f7f7] text-[#525252]" : "bg-[#f7f7f7] text-muted")}><Laptop size={14} /></span>
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-[11.5px] font-semibold text-ink">{session.current ? "This device" : session.userAgent || "Unknown device"}</p>
                       <p className="truncate text-[9.5px] text-muted">{session.ip || "unknown IP"} · last seen {timeAgo(session.lastSeenAt)}</p>
-                      <p className="text-[9px] text-[#a79b88]">Expires {formatDateTime(session.expiresAt)}</p>
+                      <p className="text-[9px] text-[#a3a3a3]">Expires {formatDateTime(session.expiresAt)}</p>
                     </div>
                     {session.current ? (
                       <Badge className="bg-ink text-white ring-ink">current</Badge>
                     ) : (
-                      <button type="button" onClick={() => setRevokeTarget(session)} className="grid h-7 w-7 place-items-center rounded-full text-[#a79b88] hover:bg-cream-soft hover:text-ink" title="Sign out this session"><Trash2 size={13} /></button>
+                      <button type="button" onClick={() => setRevokeTarget(session)} className="grid h-7 w-7 place-items-center  text-[#a3a3a3] hover:bg-[#f7f7f7] hover:text-ink" title="Sign out this session"><Trash2 size={13} /></button>
                     )}
                   </div>
                 ))}
@@ -462,7 +462,7 @@ export default function SettingsPage() {
             </Card>
 
             <Card className="p-5">
-              <p className="flex items-center gap-1.5 text-[9.5px] font-bold tracking-[0.18em] text-[#5f574a] uppercase"><ShieldCheck size={11} /> Built-in protection</p>
+              <p className="flex items-center gap-1.5 text-[9.5px] font-bold tracking-[0.18em] text-[#525252] uppercase"><ShieldCheck size={11} /> Built-in protection</p>
               <div className="mt-3 space-y-2.5 text-[11px] leading-relaxed text-muted">
                 {[
                   "Scrypt password hashing with per-user salts",
@@ -472,13 +472,13 @@ export default function SettingsPage() {
                   "Strict CORS allowlist and security headers",
                   "Bounded uploads and validated request payloads",
                 ].map((item) => (
-                  <p key={item} className="flex gap-2"><Check size={12} className="mt-0.5 shrink-0 text-[#5f574a]" /> {item}</p>
+                  <p key={item} className="flex gap-2"><Check size={12} className="mt-0.5 shrink-0 text-[#525252]" /> {item}</p>
                 ))}
               </div>
-              <div className="mt-4 flex items-start gap-2 rounded-xl bg-cream-soft p-3 text-[10.5px] leading-relaxed text-muted">
-                <TriangleAlert size={13} className="mt-0.5 shrink-0 text-[#5f574a]" />
-                Production keeps <code className="mx-1 rounded bg-white px-1">COOKIE_DOMAIN</code> blank. Admin and website call{" "}
-                <code className="mx-1 rounded bg-white px-1">/api</code> on their own domain, so the session is host-only and first-party.
+              <div className="mt-4 flex items-start gap-2  bg-[#f7f7f7] p-3 text-[10.5px] leading-relaxed text-muted">
+                <TriangleAlert size={13} className="mt-0.5 shrink-0 text-[#525252]" />
+                Production keeps <code className="mx-1  bg-white px-1">COOKIE_DOMAIN</code> blank. Admin and website call{" "}
+                <code className="mx-1  bg-white px-1">/api</code> on their own domain, so the session is host-only and first-party.
                 HTTPS makes the cookie Secure automatically.
               </div>
             </Card>

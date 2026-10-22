@@ -251,7 +251,7 @@ function InboxView() {
       />
 
       <div className="grid gap-3 lg:grid-cols-[315px_minmax(0,1fr)] xl:grid-cols-[315px_minmax(0,1fr)_270px]">
-        <Card className={cn("flex h-[calc(100vh-245px)] min-h-[540px] flex-col overflow-hidden", selectedId && "hidden lg:flex")}>
+        <Card className={cn("flex h-[calc(100vh-237px)] min-h-[540px] flex-col overflow-hidden", selectedId && "hidden lg:flex")}>
           <div className="border-b border-ink/6 p-3">
             <SearchInput value={query} onChange={setQuery} placeholder="Search conversations…" />
             <div className="mt-2.5">
@@ -270,15 +270,15 @@ function InboxView() {
                     setShowInfo(true);
                   }}
                   className={cn(
-                    "relative flex w-full gap-2.5 border-b border-ink/4 px-3.5 py-3.5 text-left transition",
-                    active ? "bg-cream-soft" : "hover:bg-cream-soft"
+                    "relative flex w-full gap-2.5 border-b border-ink/4 px-3.5 py-3.5 text-left transition-colors",
+                    active ? "bg-[#f7f7f7]" : "hover:bg-[#f7f7f7]"
                   )}
                 >
-                  {active && <span className="absolute top-3 bottom-3 left-0 w-[2px] rounded-full bg-[#525252]" />}
+                  {active && <span className="absolute top-3 bottom-3 left-0 w-[2px]  bg-[#525252]" />}
                   <div className="relative">
                     <Avatar name={thread.customerName} size="sm" />
                     {thread.unreadAdmin > 0 && (
-                      <span className="absolute -top-0.5 -right-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-[#171717] px-1 text-[8px] font-bold text-white ring-2 ring-white">
+                      <span className="absolute -top-0.5 -right-0.5 grid h-4 min-w-4 place-items-center  bg-[#171717] px-1 text-[8px] font-bold text-white ring-2 ring-white">
                         {thread.unreadAdmin}
                       </span>
                     )}
@@ -286,18 +286,18 @@ function InboxView() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
                       <p className="truncate text-[11.5px] font-bold text-ink">{thread.customerName}</p>
-                      <span className="shrink-0 text-[9px] text-[#a79b88]">{timeAgo(thread.lastMessageAt)}</span>
+                      <span className="shrink-0 text-[9px] text-[#a3a3a3]">{timeAgo(thread.lastMessageAt)}</span>
                     </div>
                     <p className="mt-0.5 truncate text-[10.5px] leading-relaxed text-muted">{thread.lastMessage || "No messages yet"}</p>
                     <div className="mt-1.5 flex items-center gap-1.5">
                       <span
                         className={cn(
-                          "h-1.5 w-1.5 rounded-full",
-                          thread.status === "open" ? "bg-ink" : thread.status === "waiting" ? "bg-[#b1a48f]" : "bg-[#d7ccba]"
+                          "h-1.5 w-1.5 ",
+                          thread.status === "open" ? "bg-ink" : thread.status === "waiting" ? "bg-[#a3a3a3]" : "bg-[#d4d4d4]"
                         )}
                       />
-                      <span className="text-[8.5px] font-semibold tracking-[0.06em] text-[#a79b88] uppercase">{thread.status}</span>
-                      {thread.city && <span className="text-[8.5px] text-[#a79b88]">· {thread.city}</span>}
+                      <span className="text-[8.5px] font-semibold tracking-[0.06em] text-[#a3a3a3] uppercase">{thread.status}</span>
+                      {thread.city && <span className="text-[8.5px] text-[#a3a3a3]">· {thread.city}</span>}
                     </div>
                   </div>
                 </button>
@@ -310,7 +310,7 @@ function InboxView() {
           </div>
         </Card>
 
-        <Card className={cn("flex h-[calc(100vh-245px)] min-h-[540px] flex-col overflow-hidden", !selectedId && "hidden lg:flex")}>
+        <Card className={cn("flex h-[calc(100vh-237px)] min-h-[540px] flex-col overflow-hidden", !selectedId && "hidden lg:flex")}>
           {!selectedId && (
             <div className="flex flex-1 items-center justify-center">
               <EmptyState
@@ -336,7 +336,7 @@ function InboxView() {
                 <button
                   type="button"
                   onClick={() => setSelectedId(null)}
-                  className="grid h-8 w-8 place-items-center rounded-full text-[#5f574a] hover:bg-ink/5 lg:hidden"
+                  className="grid h-8 w-8 place-items-center  text-[#525252] hover:bg-ink/5 lg:hidden"
                   aria-label="Back to conversations"
                 >
                   <ArrowLeft size={16} />
@@ -361,30 +361,30 @@ function InboxView() {
                 <button
                   type="button"
                   onClick={() => setShowInfo((value) => !value)}
-                  className="grid h-8 w-8 place-items-center rounded-full text-[#5f574a] hover:bg-ink/5 xl:hidden"
+                  className="grid h-8 w-8 place-items-center  text-[#525252] hover:bg-ink/5 xl:hidden"
                   aria-label="Toggle contact details"
                 >
                   <MoreHorizontal size={16} />
                 </button>
                 <div className="hidden items-center gap-1 xl:flex">
-                  <a href={toPhoneHref(detail.thread.phone)} className="grid h-8 w-8 place-items-center rounded-full text-[#5f574a] hover:bg-ink/5" title="Call">
+                  <a href={toPhoneHref(detail.thread.phone)} className="grid h-8 w-8 place-items-center  text-[#525252] hover:bg-ink/5" title="Call">
                     <Phone size={14} />
                   </a>
-                  <a href={whatsappHref(detail.thread.phone, `Hi ${detail.thread.customerName.split(" ")[0]}, this is Venue On My Plate.`)} target="_blank" rel="noreferrer" className="grid h-8 w-8 place-items-center rounded-full text-[#5f574a] hover:bg-ink/5" title="WhatsApp">
+                  <a href={whatsappHref(detail.thread.phone, `Hi ${detail.thread.customerName.split(" ")[0]}, this is Venue On My Plate.`)} target="_blank" rel="noreferrer" className="grid h-8 w-8 place-items-center  text-[#525252] hover:bg-ink/5" title="WhatsApp">
                     <Send size={14} />
                   </a>
-                  <a href={mailtoHref(detail.thread.email)} className="grid h-8 w-8 place-items-center rounded-full text-[#5f574a] hover:bg-ink/5" title="Email">
+                  <a href={mailtoHref(detail.thread.email)} className="grid h-8 w-8 place-items-center  text-[#525252] hover:bg-ink/5" title="Email">
                     <Mail size={14} />
                   </a>
                 </div>
               </div>
 
-              <div className="scrollbar-thin flex-1 overflow-y-auto bg-cream-soft px-4 py-4">
+              <div className="scrollbar-thin flex-1 overflow-y-auto bg-white px-4 py-4">
                 {messagesByDay.map((group) => (
                   <div key={group.day}>
                     <div className="my-4 flex items-center gap-3">
                       <span className="h-px flex-1 bg-ink/6" />
-                      <span className="text-[8.5px] font-bold tracking-[0.14em] text-[#a79b88] uppercase">
+                      <span className="text-[8.5px] font-bold tracking-[0.14em] text-[#a3a3a3] uppercase">
                         {new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short", year: "numeric" }).format(new Date(group.day))}
                       </span>
                       <span className="h-px flex-1 bg-ink/6" />
@@ -398,24 +398,24 @@ function InboxView() {
                             <div className={cn("max-w-[82%]", mine && "items-end")}>
                               <div
                                 className={cn(
-                                  "rounded-xl px-3.5 py-2.5 text-[12px] leading-relaxed shadow-sm",
+                                  " px-3.5 py-2.5 text-[12px] leading-relaxed",
                                   mine
-                                    ? "rounded-br-md bg-ink text-[#fafafa]"
+                                    ? " bg-ink text-[#fafafa]"
                                     : bot
-                                      ? "rounded-bl-md border border-line bg-cream-soft text-[#5f574a]"
-                                      : "rounded-bl-md border border-ink/6 bg-white text-[#171717]"
+                                      ? " border border-line bg-[#f7f7f7] text-[#525252]"
+                                      : " border border-ink/6 bg-white text-[#171717]"
                                 )}
                               >
                                 {bot && (
-                                  <p className="mb-1 flex items-center gap-1 text-[8.5px] font-bold tracking-[0.1em] text-[#5f574a] uppercase">
+                                  <p className="mb-1 flex items-center gap-1 text-[8.5px] font-bold tracking-[0.1em] text-[#525252] uppercase">
                                     <Sparkles size={9} /> Plate concierge
                                   </p>
                                 )}
                                 {message.body}
                               </div>
-                              <div className={cn("mt-1 flex items-center gap-1 text-[8.5px] text-[#a79b88]", mine && "justify-end")}>
+                              <div className={cn("mt-1 flex items-center gap-1 text-[8.5px] text-[#a3a3a3]", mine && "justify-end")}>
                                 {mine ? "You" : bot ? "Concierge" : detail.thread.customerName} · {formatDateTime(message.createdAt)}
-                                {mine && <CheckCheck size={10} className="text-[#5f574a]" />}
+                                {mine && <CheckCheck size={10} className="text-[#525252]" />}
                               </div>
                             </div>
                           </div>
@@ -434,7 +434,7 @@ function InboxView() {
                       key={index}
                       type="button"
                       onClick={() => setReply(text)}
-                      className="shrink-0 rounded-full border border-ink/8 bg-cream-soft px-2.5 py-1 text-[9.5px] font-medium text-[#5f574a] transition hover:border-line-strong hover:text-ink"
+                      className="shrink-0  border border-ink/8 bg-[#f7f7f7] px-2.5 py-1 text-[9.5px] font-medium text-[#525252] transition-colors hover:border-line-strong hover:text-ink"
                     >
                       {text.length > 46 ? `${text.slice(0, 46)}…` : text}
                     </button>
@@ -475,7 +475,7 @@ function InboxView() {
                     {detail.linkedEnquiry && (
                       <Link
                         href={`/enquiries?focus=${detail.linkedEnquiry.id}`}
-                        className="flex items-center gap-1 rounded-full bg-cream-soft px-2.5 py-1 text-[9.5px] font-semibold text-[#5f574a] hover:underline"
+                        className="flex items-center gap-1  bg-[#f7f7f7] px-2.5 py-1 text-[9.5px] font-semibold text-[#525252] hover:underline"
                       >
                         Linked {detail.linkedEnquiry.reference} <ArrowUpRight size={10} />
                       </Link>
@@ -484,7 +484,7 @@ function InboxView() {
                   <button
                     type="button"
                     onClick={() => setDeleteTarget(detail.thread)}
-                    className="flex items-center gap-1 text-[9.5px] font-medium text-[#a79b88] hover:text-ink"
+                    className="flex items-center gap-1 text-[9.5px] font-medium text-[#a3a3a3] hover:text-ink"
                   >
                     <Trash2 size={10} /> Remove thread
                   </button>
@@ -494,29 +494,29 @@ function InboxView() {
           )}
         </Card>
 
-        <Card className={cn("hidden h-[calc(100vh-245px)] min-h-[540px] flex-col overflow-hidden xl:flex", !showInfo && "xl:hidden")}>
+        <Card className={cn("hidden h-[calc(100vh-237px)] min-h-[540px] flex-col overflow-hidden xl:flex", !showInfo && "xl:hidden")}>
           {detail ? (
             <div className="scrollbar-thin flex-1 overflow-y-auto">
               <div className="border-b border-ink/6 p-4">
-                <p className="text-[9px] font-bold tracking-[0.18em] text-[#5f574a] uppercase">Contact card</p>
+                <p className="text-[9px] font-bold tracking-[0.18em] text-[#525252] uppercase">Contact card</p>
                 <div className="mt-3 flex flex-col items-center text-center">
                   <Avatar name={detail.thread.customerName} size="lg" />
                   <p className="mt-2 text-[13px] font-bold text-ink">{detail.thread.customerName}</p>
                   <p className="text-[10px] text-muted">{detail.thread.city || "City not shared"}</p>
                 </div>
                 <div className="mt-4 space-y-2">
-                  <a href={toPhoneHref(detail.thread.phone)} className="flex items-center gap-2 rounded-lg bg-cream-soft px-2.5 py-2 text-[11px] font-medium text-[#5f574a] hover:bg-cream-soft">
-                    <Phone size={12} className="text-[#5f574a]" /> {detail.thread.phone || "No phone"}
+                  <a href={toPhoneHref(detail.thread.phone)} className="flex items-center gap-2  bg-[#f7f7f7] px-2.5 py-2 text-[11px] font-medium text-[#525252] hover:bg-[#f7f7f7]">
+                    <Phone size={12} className="text-[#525252]" /> {detail.thread.phone || "No phone"}
                   </a>
-                  <a href={mailtoHref(detail.thread.email)} className="flex items-center gap-2 truncate rounded-lg bg-cream-soft px-2.5 py-2 text-[11px] font-medium text-[#5f574a] hover:bg-cream-soft">
-                    <Mail size={12} className="shrink-0 text-[#5f574a]" /> <span className="truncate">{detail.thread.email || "No email"}</span>
+                  <a href={mailtoHref(detail.thread.email)} className="flex items-center gap-2 truncate  bg-[#f7f7f7] px-2.5 py-2 text-[11px] font-medium text-[#525252] hover:bg-[#f7f7f7]">
+                    <Mail size={12} className="shrink-0 text-[#525252]" /> <span className="truncate">{detail.thread.email || "No email"}</span>
                   </a>
                 </div>
               </div>
               <div className="space-y-3 p-4">
                 <div>
-                  <p className="text-[9px] font-bold tracking-[0.12em] text-[#a79b88] uppercase">Conversation</p>
-                  <div className="mt-1.5 space-y-1.5 text-[10.5px] text-[#5f574a]">
+                  <p className="text-[9px] font-bold tracking-[0.12em] text-[#a3a3a3] uppercase">Conversation</p>
+                  <div className="mt-1.5 space-y-1.5 text-[10.5px] text-[#525252]">
                     <p className="flex items-center justify-between"><span className="text-muted">Reference</span> <span className="font-semibold">{detail.thread.reference}</span></p>
                     <p className="flex items-center justify-between"><span className="text-muted">Channel</span> <span className="font-semibold">{detail.thread.channel}</span></p>
                     <p className="flex items-center justify-between"><span className="text-muted">Started</span> <span className="font-semibold">{formatDateTime(detail.thread.createdAt)}</span></p>
@@ -524,18 +524,18 @@ function InboxView() {
                   </div>
                 </div>
                 {detail.linkedEnquiry && (
-                  <div className="rounded-xl border border-line bg-cream-soft p-3">
-                    <p className="flex items-center gap-1 text-[9px] font-bold tracking-[0.12em] text-[#5f574a] uppercase">
+                  <div className=" border border-line bg-[#f7f7f7] p-3">
+                    <p className="flex items-center gap-1 text-[9px] font-bold tracking-[0.12em] text-[#525252] uppercase">
                       <UserRound size={10} /> Linked enquiry
                     </p>
                     <p className="mt-1 text-[11.5px] font-semibold text-ink">{detail.linkedEnquiry.reference}</p>
-                    <Link href={`/enquiries?focus=${detail.linkedEnquiry.id}`} className="mt-1 inline-flex items-center gap-1 text-[10px] font-semibold text-[#5f574a] hover:underline">
+                    <Link href={`/enquiries?focus=${detail.linkedEnquiry.id}`} className="mt-1 inline-flex items-center gap-1 text-[10px] font-semibold text-[#525252] hover:underline">
                       Open lead <ArrowUpRight size={10} />
                     </Link>
                   </div>
                 )}
                 <div>
-                  <p className="text-[9px] font-bold tracking-[0.12em] text-[#a79b88] uppercase">Assignment</p>
+                  <p className="text-[9px] font-bold tracking-[0.12em] text-[#a3a3a3] uppercase">Assignment</p>
                   <Select
                     value={detail.thread.assignee}
                     onChange={(event) => updateThread({ assignee: event.target.value }, "Assignment updated")}
@@ -552,7 +552,7 @@ function InboxView() {
               </div>
             </div>
           ) : (
-            <div className="flex flex-1 items-center justify-center p-5 text-center text-[11px] text-[#a79b88]">
+            <div className="flex flex-1 items-center justify-center p-5 text-center text-[11px] text-[#a3a3a3]">
               Contact details appear when a conversation is open.
             </div>
           )}
@@ -605,7 +605,7 @@ function InboxView() {
 
 export default function InboxPage() {
   return (
-    <Suspense fallback={<Skeleton className="h-[600px] rounded-xl" />}>
+    <Suspense fallback={<Skeleton className="h-[600px] " />}>
       <InboxView />
     </Suspense>
   );

@@ -10,12 +10,12 @@ export default function Loading() {
       </div>
       <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {[0, 1, 2, 3].map((item) => (
-          <Skeleton key={item} className="h-[172px] rounded-xl" />
+          <Skeleton key={item} className="h-[172px] " />
         ))}
       </div>
       <div className="mt-4 grid gap-4 lg:grid-cols-[1.5fr_1fr]">
-        <Skeleton className="h-[330px] rounded-xl" />
-        <Skeleton className="h-[330px] rounded-xl" />
+        <Skeleton className="h-[330px] " />
+        <Skeleton className="h-[330px] " />
       </div>
     </div>
   );

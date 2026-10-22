@@ -32,8 +32,8 @@ function ChartTooltip({
 }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-md border border-line bg-paper px-3 py-2 shadow-[0_20px_44px_-24px_rgba(23,19,14,0.35)]">
-      <p className="text-[8.5px] font-semibold tracking-[0.16em] text-[#948771] uppercase">
+    <div className="border border-ink bg-white px-3 py-2">
+      <p className="text-[8px] font-bold tracking-[0.18em] text-[#8a8a8a] uppercase">
         {label ? shortDate(label) : ""}
       </p>
       <p className="mt-0.5 text-[13px] font-semibold text-ink">
@@ -50,15 +50,15 @@ export function TrendChart({ data }: { data: { date: string; enquiries: number }
         <AreaChart data={data} margin={{ top: 8, right: 8, left: -22, bottom: 0 }}>
           <defs>
             <linearGradient id="enquiryFill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#17130e" stopOpacity={0.16} />
-              <stop offset="100%" stopColor="#17130e" stopOpacity={0.01} />
+              <stop offset="0%" stopColor="#0a0a0a" stopOpacity={0.16} />
+              <stop offset="100%" stopColor="#0a0a0a" stopOpacity={0.01} />
             </linearGradient>
           </defs>
-          <CartesianGrid stroke="#e8dfd0" strokeDasharray="3 4" vertical={false} />
+          <CartesianGrid stroke="#eeeeee" vertical={false} />
           <XAxis
             dataKey="date"
             tickFormatter={shortDate}
-            tick={{ fill: "#817665", fontSize: 10 }}
+            tick={{ fill: "#6b6b6b", fontSize: 10 }}
             tickLine={false}
             axisLine={false}
             interval="preserveStartEnd"
@@ -66,19 +66,19 @@ export function TrendChart({ data }: { data: { date: string; enquiries: number }
           />
           <YAxis
             allowDecimals={false}
-            tick={{ fill: "#817665", fontSize: 10 }}
+            tick={{ fill: "#6b6b6b", fontSize: 10 }}
             tickLine={false}
             axisLine={false}
             width={40}
           />
-          <Tooltip content={<ChartTooltip suffix="enquiries" />} cursor={{ stroke: "#b5a993", strokeDasharray: "3 4" }} />
+          <Tooltip content={<ChartTooltip suffix="enquiries" />} cursor={{ stroke: "#bdbdbd" }} />
           <Area
             type="monotone"
             dataKey="enquiries"
-            stroke="#17130e"
+            stroke="#0a0a0a"
             strokeWidth={2}
             fill="url(#enquiryFill)"
-            activeDot={{ r: 4, fill: "#17130e", stroke: "#fff", strokeWidth: 2 }}
+            activeDot={{ r: 4, fill: "#0a0a0a", stroke: "#fff", strokeWidth: 2 }}
           />
         </AreaChart>
       </ResponsiveContainer>
@@ -86,7 +86,7 @@ export function TrendChart({ data }: { data: { date: string; enquiries: number }
   );
 }
 
-const DEFAULT_COLORS = ["#17130e", "#4b4337", "#817665", "#b1a48f", "#d4c7b4", "#e8dfd0"];
+const DEFAULT_COLORS = ["#0a0a0a", "#404040", "#6b6b6b", "#a3a3a3", "#d4d4d4", "#ececec"];
 
 export function StatusDonut({
   data,
@@ -116,7 +116,7 @@ export function StatusDonut({
             {(filtered.length ? filtered : [{ name: "No data", value: 1 }]).map((entry, index) => (
               <Cell
                 key={`${entry.name}-${index}`}
-                fill={filtered.length ? colors[index % colors.length] : "#ece3d4"}
+                fill={filtered.length ? colors[index % colors.length] : "#f0f0f0"}
               />
             ))}
           </Pie>
@@ -125,7 +125,7 @@ export function StatusDonut({
       </ResponsiveContainer>
       <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
         <p className="font-display text-[34px] leading-[0.8] font-semibold tracking-[-0.025em] text-ink">{centerValue}</p>
-        <p className="mt-1.5 text-[8px] font-semibold tracking-[0.18em] text-[#948771] uppercase">{centerLabel}</p>
+        <p className="mt-1.5 text-[8px] font-bold tracking-[0.2em] text-[#8a8a8a] uppercase">{centerLabel}</p>
       </div>
     </div>
   );
@@ -141,9 +141,9 @@ export function SourceBars({ data }: { data: { source: string; count: number; la
             <span className="text-[11.5px] font-medium text-muted">{item.label}</span>
             <span className="text-[11px] font-semibold text-ink">{item.count}</span>
           </div>
-          <div className="h-1.5 overflow-hidden rounded-full bg-cream">
+          <div className="h-1.5 overflow-hidden bg-[#f0f0f0]">
             <div
-              className={cn("h-full rounded-full", index === 0 ? "bg-ink" : index === 1 ? "bg-[#5b5245]" : "bg-[#a49680]")}
+              className={cn("h-full", index === 0 ? "bg-ink" : index === 1 ? "bg-[#404040]" : "bg-[#a3a3a3]")}
               style={{ width: `${Math.max(4, (item.count / max) * 100)}%` }}
             />
           </div>

@@ -35,19 +35,19 @@ export function Sidebar({
           type="button"
           aria-label="Close navigation"
           onClick={onClose}
-          className="fixed inset-0 z-40 bg-ink/35 backdrop-blur-[2px] lg:hidden"
+          className="fixed inset-0 z-40 bg-ink/35 lg:hidden"
         />
       )}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-[264px] flex-col border-r border-brand-line bg-brand-panel text-ink transition-[width,transform] duration-300 lg:translate-x-0",
-          collapsed ? "lg:w-[82px]" : "lg:w-[264px]",
+          "fixed inset-y-0 left-0 z-50 flex w-[264px] flex-col border-r border-line bg-white text-ink transition-[width,transform] duration-200 lg:translate-x-0",
+          collapsed ? "lg:w-[76px]" : "lg:w-[264px]",
           open ? "translate-x-0" : "-translate-x-full"
         )}
       >
         <div
           className={cn(
-            "flex h-[72px] shrink-0 items-center border-b border-brand-line/80",
+            "flex h-[68px] shrink-0 items-center border-b border-line",
             collapsed ? "lg:justify-center lg:px-0" : "justify-between px-5"
           )}
         >
@@ -65,7 +65,7 @@ export function Sidebar({
               href="/"
               onClick={onClose}
               aria-label="Venue On My Plate — overview"
-              className="font-display hidden h-9 w-9 place-items-center rounded-[6px] bg-ink text-[19px] leading-none font-semibold text-white lg:grid"
+              className="font-display hidden h-9 w-9 place-items-center bg-ink text-[19px] leading-none font-semibold text-white lg:grid"
             >
               V
             </Link>
@@ -74,7 +74,7 @@ export function Sidebar({
             type="button"
             onClick={onClose}
             aria-label="Close navigation"
-            className="grid h-8 w-8 place-items-center rounded-md text-muted transition hover:bg-paper hover:text-ink lg:hidden"
+            className="grid h-8 w-8 place-items-center text-muted transition-colors hover:bg-[#f5f5f5] hover:text-ink lg:hidden"
           >
             <X size={16} />
           </button>
@@ -85,7 +85,7 @@ export function Sidebar({
             <div key={group.label} className={cn(groupIndex > 0 && "mt-6")}>
               <p
                 className={cn(
-                  "mb-2 px-3 text-[9px] font-semibold tracking-[0.16em] text-brand-faint uppercase",
+                  "mb-2 px-3 text-[8px] font-bold tracking-[0.22em] text-brand-faint uppercase",
                   collapsed && "lg:hidden"
                 )}
               >
@@ -107,11 +107,11 @@ export function Sidebar({
                       title={collapsed ? item.label : undefined}
                       aria-current={active ? "page" : undefined}
                       className={cn(
-                        "group relative flex h-[42px] items-center gap-3 rounded-[7px] text-[12.5px] font-medium transition-colors",
+                        "group relative flex h-[42px] items-center gap-3 text-[12px] font-semibold tracking-[0.005em] transition-colors",
                         collapsed ? "lg:justify-center lg:px-0" : "px-3",
                         active
-                          ? "bg-ink text-white shadow-[0_10px_20px_-18px_rgba(23,19,14,0.9)]"
-                          : "text-brand-muted hover:bg-white/70 hover:text-ink"
+                          ? "bg-ink text-white"
+                          : "text-brand-muted hover:bg-[#f5f5f5] hover:text-ink"
                       )}
                     >
                       <item.icon
@@ -129,8 +129,8 @@ export function Sidebar({
                         <>
                           <span
                             className={cn(
-                              "grid h-[19px] min-w-[19px] place-items-center rounded-[5px] px-1 text-[9px] font-bold tabular-nums",
-                              active ? "bg-white/15 text-white" : "bg-paper text-brand-muted",
+                              "grid h-[18px] min-w-[18px] place-items-center px-1 text-[8.5px] font-bold tabular-nums",
+                              active ? "bg-white/15 text-white" : "bg-[#f0f0f0] text-brand-muted",
                               collapsed && "lg:hidden"
                             )}
                           >
@@ -138,7 +138,7 @@ export function Sidebar({
                           </span>
                           <span
                             className={cn(
-                              "absolute top-2 right-2 hidden h-1.5 w-1.5 rounded-full",
+                              "absolute top-2 right-2 hidden h-1.5 w-1.5 ",
                               active ? "bg-white" : "bg-ink",
                               collapsed && "lg:block"
                             )}
@@ -154,16 +154,16 @@ export function Sidebar({
           ))}
         </nav>
 
-        <div className={cn("border-t border-brand-line p-3", collapsed && "lg:px-2")}>
+        <div className={cn("border-t border-line p-3", collapsed && "lg:px-2")}>
           <div
             className={cn(
-              "mb-2.5 flex items-center gap-1.5 px-2 text-[9px] font-semibold tracking-[0.08em] text-brand-faint uppercase",
+              "mb-2.5 flex items-center gap-1.5 px-2 text-[8px] font-bold tracking-[0.14em] text-brand-faint uppercase",
               collapsed && "lg:hidden"
             )}
           >
             <span
               className={cn(
-                "h-1.5 w-1.5 rounded-full",
+                "h-1.5 w-1.5 ",
                 connected ? "bg-ink live-dot" : "bg-brand-line-strong"
               )}
             />
@@ -171,8 +171,8 @@ export function Sidebar({
           </div>
           <div
             className={cn(
-              "flex items-center gap-2.5 rounded-[7px] p-1.5",
-              collapsed ? "lg:justify-center lg:p-0" : "bg-white/45"
+              "flex items-center gap-2.5 p-1.5",
+              collapsed ? "lg:justify-center lg:p-0" : "bg-[#fafafa]"
             )}
             title={collapsed ? user?.name || "Account" : undefined}
           >
@@ -191,7 +191,7 @@ export function Sidebar({
               aria-label="Sign out"
               title="Sign out"
               className={cn(
-                "grid h-8 w-8 place-items-center rounded-md text-brand-faint transition hover:bg-paper hover:text-ink",
+                "grid h-8 w-8 place-items-center text-brand-faint transition-colors hover:bg-white hover:text-ink",
                 collapsed && "lg:hidden"
               )}
             >

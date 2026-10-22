@@ -175,42 +175,42 @@ export default function DestinationsPage() {
         </div>
       </Card>
 
-      {!data && <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">{[0, 1, 2, 3, 4, 5].map((row) => <Skeleton key={row} className="h-[290px] rounded-xl" />)}</div>}
+      {!data && <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">{[0, 1, 2, 3, 4, 5].map((row) => <Skeleton key={row} className="h-[290px] " />)}</div>}
 
       {data && rows.length > 0 && (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {rows.map((item, index) => (
-            <Card key={item.id} className="group overflow-hidden transition hover:-translate-y-0.5 hover:border-line">
-              <div className="relative h-36 overflow-hidden bg-cream">
+            <Card key={item.id} className="group overflow-hidden transition-colors hover:border-line">
+              <div className="relative h-36 overflow-hidden bg-[#f0f0f0]">
                 {item.image ? (
-                  <img src={item.image} alt={item.imageAlt || item.name} className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" loading="lazy" />
+                  <img src={item.image} alt={item.imageAlt || item.name} className="h-full w-full object-cover" loading="lazy" decoding="async" />
                 ) : (
-                  <div className="grid h-full w-full place-items-center text-[#a79b88]"><MapPin size={28} /></div>
+                  <div className="grid h-full w-full place-items-center text-[#a3a3a3]"><MapPin size={28} /></div>
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
                 <div className="absolute right-2.5 bottom-2.5"><StatusPill value={item.status} map={PUBLISH_STATUS} /></div>
                 {index === 0 && (
-                  <span className="absolute top-2.5 left-2.5 flex items-center gap-1 rounded-full bg-cream-soft/95 px-2 py-1 text-[8.5px] font-bold tracking-[0.08em] text-[#5f574a] uppercase">
+                  <span className="absolute top-2.5 left-2.5 flex items-center gap-1  bg-[#f7f7f7]/95 px-2 py-1 text-[8.5px] font-bold tracking-[0.08em] text-[#525252] uppercase">
                     <Sparkles size={9} /> Spotlight
                   </span>
                 )}
                 <h3 className="font-display absolute bottom-2.5 left-3.5 max-w-[75%] text-[26px] leading-none font-semibold text-white">{item.name}</h3>
               </div>
               <div className="p-4">
-                <p className="line-clamp-1 text-[10px] font-bold tracking-[0.1em] text-[#5f574a] uppercase">{item.tagline || "Destination"}</p>
+                <p className="line-clamp-1 text-[10px] font-bold tracking-[0.1em] text-[#525252] uppercase">{item.tagline || "Destination"}</p>
                 <p className="mt-1.5 line-clamp-2 min-h-[32px] text-[11.5px] leading-relaxed text-muted">{item.description || "No description yet."}</p>
                 <div className="mt-3 flex flex-wrap gap-1">
                   {item.popularTypes.slice(0, 3).map((type) => (
-                    <Badge key={type} className="bg-cream-soft text-[#5f574a] ring-ink/6">{type}</Badge>
+                    <Badge key={type} className="bg-[#f7f7f7] text-[#525252] ring-ink/6">{type}</Badge>
                   ))}
                 </div>
                 <div className="mt-3 flex items-center justify-between border-t border-ink/5 pt-3">
                   <span className="text-[10px] text-muted">{item.venueCountLabel || "Venue count not set"}</span>
                   <div className="flex items-center gap-1">
-                    <button type="button" onClick={() => setForm(toForm(item))} className="grid h-7 w-7 place-items-center rounded-full text-muted transition hover:bg-cream-soft hover:text-[#5f574a]" title="Edit">
+                    <button type="button" onClick={() => setForm(toForm(item))} className="grid h-7 w-7 place-items-center  text-muted transition-colors hover:bg-[#f7f7f7] hover:text-[#525252]" title="Edit">
                       <Pencil size={12} />
                     </button>
-                    <button type="button" onClick={() => setDeleteTarget(item)} className="grid h-7 w-7 place-items-center rounded-full text-[#a79b88] transition hover:bg-cream-soft hover:text-ink" title="Delete">
+                    <button type="button" onClick={() => setDeleteTarget(item)} className="grid h-7 w-7 place-items-center  text-[#a3a3a3] transition-colors hover:bg-[#f7f7f7] hover:text-ink" title="Delete">
                       <Trash2 size={12} />
                     </button>
                   </div>
@@ -242,7 +242,7 @@ export default function DestinationsPage() {
         footer={form ? (
           <div className="flex items-center justify-between">
             {form.id ? (
-              <Button variant="ghost" size="sm" icon={Trash2} className="text-[#817665] hover:bg-cream-soft hover:text-ink" onClick={() => {
+              <Button variant="ghost" size="sm" icon={Trash2} className="text-[#6b6b6b] hover:bg-[#f7f7f7] hover:text-ink" onClick={() => {
                 const item = rows.find((row) => row.id === form.id);
                 if (item) setDeleteTarget(item);
               }}>Delete</Button>
@@ -271,7 +271,7 @@ export default function DestinationsPage() {
             </div>
             <Field label="Popular event types" hint="Comma separated."><Input value={form.popularTypes} onChange={(event) => setForm({ ...form, popularTypes: event.target.value })} placeholder="Wedding, Sangeet, Corporate" /></Field>
             <Field label="Cover image URL"><Input value={form.image} onChange={(event) => setForm({ ...form, image: event.target.value })} placeholder="https://…" /></Field>
-            {form.image && <div className="h-32 overflow-hidden rounded-xl border border-ink/8"><img src={form.image} alt="" className="h-full w-full object-cover" /></div>}
+            {form.image && <div className="h-32 overflow-hidden  border border-ink/8"><img src={form.image} alt="" className="h-full w-full object-cover" /></div>}
             <Field label="Image alt text"><Input value={form.imageAlt} onChange={(event) => setForm({ ...form, imageAlt: event.target.value })} /></Field>
           </div>
         )}

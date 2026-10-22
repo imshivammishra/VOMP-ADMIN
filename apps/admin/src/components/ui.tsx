@@ -31,25 +31,23 @@ export function Button({
   icon?: LucideIcon;
 }) {
   const variants: Record<ButtonVariant, string> = {
-    primary:
-      "bg-ink text-white hover:bg-[#2b251d] shadow-[0_10px_24px_-18px_rgba(23,19,14,0.8)] disabled:bg-ink/50",
-    secondary:
-      "bg-paper text-ink border border-line hover:border-ink hover:bg-cream-soft",
-    ghost: "bg-transparent text-ink hover:bg-ink/5",
-    danger: "bg-ink text-white hover:bg-[#2b251d] shadow-[0_10px_24px_-18px_rgba(23,19,14,0.8)]",
-    strong: "bg-[#302a20] text-white hover:bg-ink",
+    primary: "bg-ink text-white hover:bg-[#262626] disabled:bg-ink/50",
+    secondary: "bg-white text-ink border border-line-strong hover:border-ink hover:bg-[#f7f7f7]",
+    ghost: "bg-transparent text-ink hover:bg-ink/[0.06]",
+    danger: "bg-ink text-white hover:bg-[#262626]",
+    strong: "bg-[#171717] text-white hover:bg-ink",
   };
   const sizes: Record<ButtonSize, string> = {
-    sm: "h-8 px-3 text-[12px] gap-1.5 rounded-[5px]",
-    md: "h-10 px-4 text-[12.5px] gap-2 rounded-md",
-    lg: "h-11 px-5 text-[13.5px] gap-2 rounded-md",
+    sm: "h-8 px-3 text-[11.5px] gap-1.5",
+    md: "h-10 px-4 text-[12.5px] gap-2",
+    lg: "h-11 px-5 text-[13px] gap-2",
   };
   return (
     <button
       {...props}
       disabled={props.disabled || loading}
       className={cn(
-        "inline-flex shrink-0 items-center justify-center font-semibold transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60",
+        "inline-flex shrink-0 items-center justify-center font-semibold tracking-[0.005em] transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50",
         variants[variant],
         sizes[size],
         className
@@ -73,7 +71,7 @@ export function IconButton({
       aria-label={label}
       title={label}
       className={cn(
-        "grid h-9 w-9 shrink-0 place-items-center rounded-md text-muted transition hover:bg-cream-soft hover:text-ink disabled:opacity-40",
+        "grid h-9 w-9 shrink-0 place-items-center text-muted transition-colors hover:bg-[#f5f5f5] hover:text-ink disabled:opacity-40",
         className
       )}
     >
@@ -89,7 +87,7 @@ export function Card({
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & { children: React.ReactNode }) {
   return (
-    <div className={cn("surface rounded-[12px]", className)} {...props}>
+    <div className={cn("surface", className)} {...props}>
       {children}
     </div>
   );
@@ -109,20 +107,20 @@ export function PageHeader({
   children?: React.ReactNode;
 }) {
   return (
-    <div className="fade-up mb-6 border-t border-ink/20 pt-4">
+    <div className="fade-up mb-7 border-t-2 border-ink pt-4">
       <div className="flex flex-wrap items-end justify-between gap-5">
         <div className="min-w-0">
           {eyebrow && (
-            <p className="mb-2 flex items-center gap-2 text-[9px] font-semibold tracking-[0.18em] text-brand-faint uppercase">
-              <span className="h-px w-5 bg-ink/50" />
+            <p className="mb-2 flex items-center gap-2 text-[8.5px] font-bold tracking-[0.22em] text-brand-faint uppercase">
+              <span className="h-px w-6 bg-ink" />
               {eyebrow}
             </p>
           )}
-          <h1 className="font-display text-[34px] leading-[0.94] font-semibold tracking-[-0.025em] text-ink md:text-[40px]">
+          <h1 className="font-display text-[38px] leading-[0.9] font-semibold tracking-[-0.03em] text-ink md:text-[46px]">
             {title}
           </h1>
           {description && (
-            <p className="mt-2 max-w-2xl text-[12.5px] leading-relaxed text-muted">{description}</p>
+            <p className="mt-2.5 max-w-2xl text-[12px] leading-relaxed text-muted">{description}</p>
           )}
         </div>
         {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
@@ -145,11 +143,11 @@ export function Badge({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-[4px] px-2 py-1 text-[9px] font-semibold tracking-[0.09em] whitespace-nowrap uppercase ring-1 ring-inset",
+        "inline-flex items-center gap-1.5 px-2 py-1 text-[8.5px] font-bold tracking-[0.12em] whitespace-nowrap uppercase ring-1 ring-inset",
         className
       )}
     >
-      {dot && <span className={cn("h-1.5 w-1.5 rounded-full", dot)} />}
+      {dot && <span className={cn("h-1.5 w-1.5 ", dot)} />}
       {children}
     </span>
   );
@@ -162,7 +160,7 @@ export function StatusPill({
   value: string;
   map: Record<string, { label: string; className: string; dot?: string }>;
 }) {
-  const item = map[value] || { label: value, className: "bg-cream-soft text-muted ring-line" };
+  const item = map[value] || { label: value, className: "bg-[#f7f7f7] text-muted ring-line" };
   return (
     <Badge className={item.className} dot={item.dot}>
       {item.label}
@@ -188,7 +186,7 @@ export function Avatar({
   return (
     <span
       className={cn(
-        "inline-grid shrink-0 place-items-center rounded-full font-bold tracking-wide",
+        "inline-grid shrink-0 place-items-center  font-bold tracking-wide",
         sizes[size],
         avatarTone(name || "?"),
         className
@@ -202,7 +200,7 @@ export function Avatar({
 
 // ── Form controls ────────────────────────────────────────────────────────
 const controlBase =
-  "w-full rounded-md border border-line bg-paper px-3.5 py-2.5 text-[13px] text-ink shadow-[0_1px_0_rgba(23,19,14,0.02)] transition placeholder:text-[#a79b88] hover:border-line-strong focus:border-ink focus:ring-4 focus:ring-ink/5 focus:outline-none disabled:bg-cream-soft disabled:text-muted";
+  "w-full border border-line bg-white px-3.5 py-2.5 text-[13px] text-ink transition-colors duration-150 placeholder:text-[#a3a3a3] hover:border-line-strong focus:border-ink focus:ring-1 focus:ring-ink focus:outline-none disabled:bg-[#f7f7f7] disabled:text-muted";
 
 export function Input({ className, ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
   return <input {...props} className={cn(controlBase, className)} />;
@@ -251,7 +249,7 @@ export function Field({
     <div className={className}>
       <label
         htmlFor={htmlFor}
-        className="mb-1.5 flex items-center gap-1 text-[9.5px] font-semibold tracking-[0.12em] text-muted uppercase"
+        className="mb-1.5 flex items-center gap-1 text-[9px] font-bold tracking-[0.14em] text-muted uppercase"
       >
         {label}
         {required && <span className="text-ink">*</span>}
@@ -260,7 +258,7 @@ export function Field({
       {error ? (
         <p className="mt-1 text-[11px] font-semibold text-ink">{error}</p>
       ) : hint ? (
-        <p className="mt-1 text-[10.5px] leading-relaxed text-[#928673]">{hint}</p>
+        <p className="mt-1 text-[10.5px] leading-relaxed text-[#8a8a8a]">{hint}</p>
       ) : null}
     </div>
   );
@@ -293,14 +291,14 @@ export function Switch({
         disabled={disabled}
         onClick={() => onChange(!checked)}
         className={cn(
-          "relative mt-0.5 h-6 w-11 shrink-0 rounded-full transition-colors duration-200 disabled:opacity-50",
-          checked ? "bg-ink" : "bg-[#d7ccba]"
+          "relative mt-0.5 h-6 w-11 shrink-0 border transition-colors duration-150 disabled:opacity-50",
+          checked ? "border-ink bg-ink" : "border-[#c9c9c9] bg-[#ececec]"
         )}
       >
         <span
           className={cn(
-            "absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform duration-200",
-            checked && "translate-x-5"
+            "absolute top-[3px] left-[3px] h-4 w-4 bg-white transition-transform duration-150",
+            checked && "translate-x-6"
           )}
         />
       </button>
@@ -321,7 +319,7 @@ export function SearchInput({
 }) {
   return (
     <div className={cn("relative", className)}>
-      <Search size={15} className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-[#9b8f7c]" />
+      <Search size={15} className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-[#8a8a8a]" />
       <input
         value={value}
         onChange={(event) => onChange(event.target.value)}
@@ -333,7 +331,7 @@ export function SearchInput({
           type="button"
           onClick={() => onChange("")}
           aria-label="Clear search"
-          className="absolute top-1/2 right-2.5 grid h-6 w-6 -translate-y-1/2 place-items-center rounded-full text-muted hover:bg-cream-soft"
+          className="absolute top-1/2 right-2.5 grid h-6 w-6 -translate-y-1/2 place-items-center text-muted hover:bg-[#f0f0f0]"
         >
           <X size={13} />
         </button>
@@ -364,18 +362,18 @@ export function Tabs({
             type="button"
             onClick={() => onChange(tab.value)}
             className={cn(
-              "inline-flex shrink-0 items-center gap-1.5 rounded-[5px] px-3 py-2 text-[11.5px] font-semibold transition",
+              "inline-flex shrink-0 items-center gap-1.5 px-3 py-2 text-[11px] font-bold tracking-[0.04em] uppercase transition-colors",
               active
                 ? "bg-ink text-white"
-                : "bg-transparent text-muted hover:bg-cream-soft hover:text-ink"
+                : "bg-transparent text-muted hover:bg-[#f5f5f5] hover:text-ink"
             )}
           >
             {tab.label}
             {typeof tab.count === "number" && (
               <span
                 className={cn(
-                  "rounded-[3px] px-1.5 py-0.5 text-[8.5px] font-bold",
-                  active ? "bg-white/15 text-white" : "bg-[#ece3d4] text-muted"
+                  "px-1.5 py-0.5 text-[8.5px] font-bold",
+                  active ? "bg-white/15 text-white" : "bg-[#f0f0f0] text-muted"
                 )}
               >
                 {tab.count}
@@ -427,8 +425,8 @@ export function Modal({
   const widths = { sm: "max-w-md", md: "max-w-xl", lg: "max-w-3xl" };
   return createPortal(
     <div className="fixed inset-0 z-[80] flex items-end justify-center p-0 sm:items-center sm:p-6" role="dialog" aria-modal="true">
-      <button type="button" aria-label="Close dialog" onClick={onClose} className="absolute inset-0 cursor-default bg-ink/45 backdrop-blur-[2px]" />
-      <div className={cn("modal-in relative flex max-h-[92vh] w-full flex-col overflow-hidden rounded-t-2xl border border-line bg-paper shadow-[0_40px_100px_-30px_rgba(23,19,14,0.5)] sm:rounded-lg", widths[size])}>
+      <button type="button" aria-label="Close dialog" onClick={onClose} className="absolute inset-0 cursor-default bg-ink/40" />
+      <div className={cn("modal-in relative flex max-h-[92vh] w-full flex-col overflow-hidden border border-ink bg-white", widths[size])}>
         <div className="flex items-start justify-between gap-4 border-b border-line px-5 py-4">
           <div>
             <h2 className="font-display text-[26px] leading-none font-semibold tracking-[-0.02em] text-ink">{title}</h2>
@@ -437,7 +435,7 @@ export function Modal({
           <IconButton icon={X} label="Close" onClick={onClose} />
         </div>
         <div className="scrollbar-thin flex-1 overflow-y-auto px-5 py-5">{children}</div>
-        {footer && <div className="flex items-center justify-end gap-2 border-t border-line bg-cream-soft px-5 py-3.5">{footer}</div>}
+        {footer && <div className="flex items-center justify-end gap-2 border-t border-line bg-[#f7f7f7] px-5 py-3.5">{footer}</div>}
       </div>
     </div>,
     document.body
@@ -466,8 +464,8 @@ export function Drawer({
   const widths = { md: "sm:max-w-xl", lg: "sm:max-w-2xl" };
   return createPortal(
     <div className="fixed inset-0 z-[80]" role="dialog" aria-modal="true">
-      <button type="button" aria-label="Close panel" onClick={onClose} className="absolute inset-0 cursor-default bg-ink/40 backdrop-blur-[2px]" />
-      <div className={cn("slide-in-right absolute inset-y-0 right-0 flex w-full flex-col border-l border-line bg-paper shadow-[-30px_0_80px_-40px_rgba(23,19,14,0.4)]", widths[size])}>
+      <button type="button" aria-label="Close panel" onClick={onClose} className="absolute inset-0 cursor-default bg-ink/35" />
+      <div className={cn("slide-in-right absolute inset-y-0 right-0 flex w-full flex-col border-l border-ink bg-white", widths[size])}>
         <div className="flex items-start justify-between gap-4 border-b border-line px-5 py-4">
           <div className="min-w-0">
             <h2 className="truncate font-display text-[27px] leading-none font-semibold tracking-[-0.02em] text-ink">{title}</h2>
@@ -476,7 +474,7 @@ export function Drawer({
           <IconButton icon={X} label="Close panel" onClick={onClose} />
         </div>
         <div className="scrollbar-thin flex-1 overflow-y-auto">{children}</div>
-        {footer && <div className="border-t border-line bg-cream-soft px-5 py-3.5">{footer}</div>}
+        {footer && <div className="border-t border-line bg-[#f7f7f7] px-5 py-3.5">{footer}</div>}
       </div>
     </div>,
     document.body
@@ -540,7 +538,7 @@ export function EmptyState({
 }) {
   return (
     <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
-      <span className="grid h-14 w-14 place-items-center rounded-full bg-cream-soft text-muted ring-1 ring-line">
+      <span className="grid h-14 w-14 place-items-center bg-[#f7f7f7] text-muted ring-1 ring-line">
         <Icon size={22} strokeWidth={1.6} />
       </span>
       <p className="font-display mt-4 text-[28px] leading-none font-semibold tracking-[-0.02em] text-ink">{title}</p>
@@ -559,7 +557,7 @@ export function TableSkeleton({ rows = 6, cols = 6 }: { rows?: number; cols?: nu
     <div className="divide-y divide-black/5">
       {Array.from({ length: rows }).map((_, row) => (
         <div key={row} className="flex items-center gap-4 px-4 py-4">
-          <Skeleton className="h-9 w-9 rounded-full" />
+          <Skeleton className="h-9 w-9" />
           {Array.from({ length: cols }).map((__, col) => (
             <Skeleton key={col} className={cn("h-3.5", col === 0 ? "w-32" : "w-20")} />
           ))}
@@ -609,7 +607,7 @@ export function Pagination({
 export function Spinner({ label = "Loading" }: { label?: string }) {
   return (
     <div className="flex items-center justify-center gap-2 py-16 text-muted">
-      <Loader2 size={18} className="animate-spin text-[#9b8f7c]" />
+      <Loader2 size={18} className="animate-spin text-[#a3a3a3]" />
       <span className="text-[12px] font-medium">{label}…</span>
     </div>
   );
@@ -617,7 +615,7 @@ export function Spinner({ label = "Loading" }: { label?: string }) {
 
 export function Kbd({ children }: { children: React.ReactNode }) {
   return (
-    <kbd className="rounded-[4px] border border-line bg-paper px-1.5 py-0.5 text-[9.5px] font-semibold text-muted shadow-[0_1px_0_rgba(23,19,14,0.05)]">
+    <kbd className="border border-line bg-white px-1.5 py-0.5 text-[9px] font-bold text-muted">
       {children}
     </kbd>
   );

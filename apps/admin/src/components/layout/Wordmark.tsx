@@ -18,9 +18,9 @@ export function Wordmark({
 }) {
   const light = tone === "light";
   const marks = {
-    sm: "h-7 w-7 text-[15px] rounded-[4px]",
-    md: "h-9 w-9 text-[19px] rounded-[5px]",
-    lg: "h-12 w-12 text-[25px] rounded-md",
+    sm: "h-7 w-7 text-[15px]",
+    md: "h-9 w-9 text-[19px]",
+    lg: "h-12 w-12 text-[25px]",
   };
   const names = {
     sm: "text-[11.5px]",
@@ -39,7 +39,7 @@ export function Wordmark({
         className={cn(
           "font-display grid shrink-0 place-items-center leading-none font-semibold",
           marks[size],
-          light ? "bg-white text-ink" : "bg-ink text-[#fffdf8]"
+          light ? "border border-white/25 bg-white text-ink" : "bg-ink text-white"
         )}
       >
         V
@@ -57,8 +57,8 @@ export function Wordmark({
         {subtitle ? (
           <span
             className={cn(
-              "mt-1.5 block text-[8px] font-semibold tracking-[0.13em] uppercase",
-              light ? "text-white/40" : "text-[#948771]"
+              "mt-1.5 block text-[7.5px] font-bold tracking-[0.18em] uppercase",
+              light ? "text-white/40" : "text-[#8a8a8a]"
             )}
           >
             {subtitle}

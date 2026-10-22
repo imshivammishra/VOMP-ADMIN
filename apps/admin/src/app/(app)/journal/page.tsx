@@ -182,8 +182,8 @@ export default function JournalPage() {
                 <tr key={post.id} className="cursor-pointer" onClick={() => setForm(toForm(post))}>
                   <td>
                     <div className="flex items-center gap-3">
-                      <div className="h-11 w-14 shrink-0 overflow-hidden rounded-lg bg-cream">
-                        {post.image ? <img src={post.image} alt="" className="h-full w-full object-cover" loading="lazy" /> : <div className="grid h-full w-full place-items-center text-[#a79b88]"><BookOpen size={15} /></div>}
+                      <div className="h-11 w-14 shrink-0 overflow-hidden  bg-[#f0f0f0]">
+                        {post.image ? <img src={post.image} alt="" className="h-full w-full object-cover" loading="lazy" /> : <div className="grid h-full w-full place-items-center text-[#a3a3a3]"><BookOpen size={15} /></div>}
                       </div>
                       <div className="min-w-0">
                         <p className="max-w-[360px] truncate text-[12px] font-semibold text-ink">{post.title}</p>
@@ -191,15 +191,15 @@ export default function JournalPage() {
                       </div>
                     </div>
                   </td>
-                  <td><Badge className="bg-cream-soft text-[#5f574a] ring-ink/6">{post.category}</Badge></td>
+                  <td><Badge className="bg-[#f7f7f7] text-[#525252] ring-ink/6">{post.category}</Badge></td>
                   <td><StatusPill value={post.status} map={PUBLISH_STATUS} /></td>
-                  <td><span className="whitespace-nowrap text-[10.5px] text-[#5f574a]">{formatDate(post.publishedOn)}</span></td>
+                  <td><span className="whitespace-nowrap text-[10.5px] text-[#525252]">{formatDate(post.publishedOn)}</span></td>
                   <td><span className="text-[10.5px] text-muted">{post.readingMinutes} min</span></td>
                   <td><span className="whitespace-nowrap text-[10px] text-muted">{formatDate(post.updatedAt)}</span></td>
                   <td>
                     <div className="flex items-center gap-1" onClick={(event) => event.stopPropagation()}>
-                      <button type="button" onClick={() => setForm(toForm(post))} className="grid h-7 w-7 place-items-center rounded-full text-muted hover:bg-cream-soft hover:text-[#5f574a]" title="Edit"><Pencil size={12} /></button>
-                      <button type="button" onClick={() => setDeleteTarget(post)} className="grid h-7 w-7 place-items-center rounded-full text-[#a79b88] hover:bg-cream-soft hover:text-ink" title="Delete"><Trash2 size={12} /></button>
+                      <button type="button" onClick={() => setForm(toForm(post))} className="grid h-7 w-7 place-items-center  text-muted hover:bg-[#f7f7f7] hover:text-[#525252]" title="Edit"><Pencil size={12} /></button>
+                      <button type="button" onClick={() => setDeleteTarget(post)} className="grid h-7 w-7 place-items-center  text-[#a3a3a3] hover:bg-[#f7f7f7] hover:text-ink" title="Delete"><Trash2 size={12} /></button>
                     </div>
                   </td>
                 </tr>
@@ -220,7 +220,7 @@ export default function JournalPage() {
         size="lg"
         footer={form ? (
           <div className="flex items-center justify-between">
-            {form.id ? <Button variant="ghost" size="sm" icon={Trash2} className="text-[#817665] hover:bg-cream-soft hover:text-ink" onClick={() => { const post = rows.find((row) => row.id === form.id); if (post) setDeleteTarget(post); }}>Delete</Button> : <span />}
+            {form.id ? <Button variant="ghost" size="sm" icon={Trash2} className="text-[#6b6b6b] hover:bg-[#f7f7f7] hover:text-ink" onClick={() => { const post = rows.find((row) => row.id === form.id); if (post) setDeleteTarget(post); }}>Delete</Button> : <span />}
             <div className="flex gap-2">
               <Button variant="secondary" size="sm" onClick={() => setForm(null)}>Cancel</Button>
               <Button variant="primary" size="sm" icon={Check} loading={saving} onClick={save}>Save story</Button>
@@ -247,7 +247,7 @@ export default function JournalPage() {
             <Field label="Excerpt"><Textarea rows={2} value={form.excerpt} onChange={(event) => setForm({ ...form, excerpt: event.target.value })} /></Field>
             <Field label="Body" hint="Separate paragraphs with a blank line."><Textarea rows={12} value={form.body} onChange={(event) => setForm({ ...form, body: event.target.value })} placeholder="Start writing…" /></Field>
             <Field label="Cover image URL"><Input value={form.image} onChange={(event) => setForm({ ...form, image: event.target.value })} placeholder="https://…" /></Field>
-            {form.image && <div className="h-32 overflow-hidden rounded-xl border border-ink/8"><img src={form.image} alt="" className="h-full w-full object-cover" /></div>}
+            {form.image && <div className="h-32 overflow-hidden  border border-ink/8"><img src={form.image} alt="" className="h-full w-full object-cover" /></div>}
             <Field label="Image alt text"><Input value={form.imageAlt} onChange={(event) => setForm({ ...form, imageAlt: event.target.value })} /></Field>
           </div>
         )}
