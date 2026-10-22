@@ -1,18 +1,22 @@
-import { nowIso, sql, uid } from "../db.js";
+import { collections, nowIso, uid } from "../db.js";
 
-export function logActivity({ actor = "System", action, entity, entityId = null, detail = "" }) {
+export async function logActivity({
+  actor = "System",
+  action,
+  entity,
+  entityId = null,
+  detail = "",
+}) {
   try {
-    sql.run(
-      `INSERT INTO activity (id, actor, action, entity, entity_id, detail, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      uid("act_"),
+    await collections.activity.insertOne({
+      id: uid("act_"),
       actor,
       action,
       entity,
-      entityId,
+      entity_id: entityId,
       detail,
-      nowIso()
-    );
+      created_at: nowIso(),
+    });
   } catch (error) {
     console.error("[api] failed to write activity log", error);
   }

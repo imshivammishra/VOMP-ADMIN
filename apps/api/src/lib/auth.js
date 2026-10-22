@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 import { config } from "../config.js";
-import { nowIso, sql, uid } from "../db.js";
+import { collections, nowIso, uid } from "../db.js";
 
 const SCRYPT_KEYLEN = 64;
 
@@ -26,22 +26,20 @@ function hashToken(token) {
   return crypto.createHash("sha256").update(token).digest("hex");
 }
 
-export function createSession(userId, req) {
+export async function createSession(userId, req) {
   const token = crypto.randomBytes(32).toString("base64url");
   const created = new Date();
   const expires = new Date(created.getTime() + config.sessionHours * 60 * 60 * 1000);
-  sql.run(
-    `INSERT INTO sessions (id, user_id, token_hash, created_at, expires_at, last_seen_at, ip, user_agent)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    uid("ses_"),
-    userId,
-    hashToken(token),
-    created.toISOString(),
-    expires.toISOString(),
-    created.toISOString(),
-    req.ip || "",
-    String(req.get("user-agent") || "").slice(0, 300)
-  );
+  await collections.sessions.insertOne({
+    id: uid("ses_"),
+    user_id: userId,
+    token_hash: hashToken(token),
+    created_at: created.toISOString(),
+    expires_at: expires.toISOString(),
+    last_seen_at: created.toISOString(),
+    ip: req.ip || "",
+    user_agent: String(req.get("user-agent") || "").slice(0, 300),
+  });
   return { token, expiresAt: expires.toISOString() };
 }
 
@@ -78,71 +76,73 @@ export function readCookie(req, name) {
   return null;
 }
 
-export function loadSession(req) {
+export async function loadSession(req) {
   const token = readCookie(req, config.cookie.name);
   if (!token) return null;
-  const row = sql.get(
-    `SELECT s.id AS session_id, s.expires_at, s.last_seen_at,
-            u.id, u.email, u.name, u.role, u.status
-       FROM sessions s
-       JOIN users u ON u.id = s.user_id
-      WHERE s.token_hash = ?`,
-    hashToken(token)
-  );
-  if (!row) return null;
-  if (new Date(row.expires_at).getTime() <= Date.now()) {
-    sql.run("DELETE FROM sessions WHERE id = ?", row.session_id);
+  const session = await collections.sessions.findOne({ token_hash: hashToken(token) });
+  if (!session) return null;
+  if (new Date(session.expires_at).getTime() <= Date.now()) {
+    await collections.sessions.deleteOne({ id: session.id });
     return null;
   }
-  if (row.status !== "active") return null;
+  const user = await collections.users.findOne({ id: session.user_id });
+  if (!user || user.status !== "active") return null;
 
-  if (Date.now() - new Date(row.last_seen_at).getTime() > 60_000) {
-    sql.run("UPDATE sessions SET last_seen_at = ? WHERE id = ?", nowIso(), row.session_id);
+  if (Date.now() - new Date(session.last_seen_at).getTime() > 60_000) {
+    await collections.sessions.updateOne(
+      { id: session.id },
+      { $set: { last_seen_at: nowIso() } }
+    );
   }
 
   return {
-    sessionId: row.session_id,
-    expiresAt: row.expires_at,
-    user: { id: row.id, email: row.email, name: row.name, role: row.role },
+    sessionId: session.id,
+    expiresAt: session.expires_at,
+    user: { id: user.id, email: user.email, name: user.name, role: user.role },
   };
 }
 
-export function revokeSession(sessionId) {
-  sql.run("DELETE FROM sessions WHERE id = ?", sessionId);
+export async function revokeSession(sessionId) {
+  await collections.sessions.deleteOne({ id: sessionId });
 }
 
-export function revokeAllSessions(userId, exceptSessionId = null) {
-  if (exceptSessionId) {
-    sql.run("DELETE FROM sessions WHERE user_id = ? AND id <> ?", userId, exceptSessionId);
-  } else {
-    sql.run("DELETE FROM sessions WHERE user_id = ?", userId);
-  }
+export async function revokeAllSessions(userId, exceptSessionId = null) {
+  const filter = { user_id: userId };
+  if (exceptSessionId) filter.id = { $ne: exceptSessionId };
+  await collections.sessions.deleteMany(filter);
 }
 
 export function requireAuth(req, res, next) {
-  const session = loadSession(req);
-  if (!session) {
-    return res.status(401).json({ error: { code: "UNAUTHORIZED", message: "Please sign in to continue." } });
-  }
-  req.session = session;
-  req.user = session.user;
-  next();
+  loadSession(req)
+    .then((session) => {
+      if (!session) {
+        return res
+          .status(401)
+          .json({ error: { code: "UNAUTHORIZED", message: "Please sign in to continue." } });
+      }
+      req.session = session;
+      req.user = session.user;
+      return next();
+    })
+    .catch(next);
 }
 
 export function requireRole(...roles) {
   return (req, res, next) => {
     if (!req.user) {
-      return res.status(401).json({ error: { code: "UNAUTHORIZED", message: "Please sign in to continue." } });
+      return res
+        .status(401)
+        .json({ error: { code: "UNAUTHORIZED", message: "Please sign in to continue." } });
     }
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({
         error: { code: "FORBIDDEN", message: "Your role does not allow this action." },
       });
     }
-    next();
+    return next();
   };
 }
 
-export function pruneSessions() {
-  sql.run("DELETE FROM sessions WHERE expires_at <= ?", nowIso());
+export async function pruneSessions() {
+  await collections.sessions.deleteMany({ expires_at: { $lte: nowIso() } });
 }

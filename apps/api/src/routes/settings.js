@@ -12,8 +12,8 @@ export const settingsRouter = Router();
 
 settingsRouter.get(
   "/",
-  asyncHandler((_req, res) => {
-    ok(res, getSettings());
+  asyncHandler(async (_req, res) => {
+    ok(res, await getSettings());
   })
 );
 
@@ -31,10 +31,10 @@ settingsRouter.get(
 settingsRouter.put(
   "/",
   requireRole("admin"),
-  asyncHandler((req, res) => {
+  asyncHandler(async (req, res) => {
     const input = parse(settingsSchema)(req.body);
-    const settings = saveSettings(input);
-    logActivity({
+    const settings = await saveSettings(input);
+    await logActivity({
       actor: actorName(req),
       action: "settings.updated",
       entity: "settings",
@@ -78,7 +78,7 @@ settingsRouter.get(
       },
       secrets: {
         seedAdminPassword: mask(config.seedAdmin.password),
-        databasePath: config.dbPath,
+        database: `mongodb/${config.mongoDb}`,
         uploadsPath: config.uploadsDir,
       },
       checkedAt: nowIso(),

@@ -30,6 +30,18 @@ const frontendUrl = cleanUrl(process.env.FRONTEND_URL, "http://localhost:3100");
 const adminUrl = cleanUrl(process.env.ADMIN_URL, "http://localhost:3102");
 const apiPublicUrl = cleanUrl(process.env.API_PUBLIC_URL, `http://localhost:${port}`);
 
+const mongoUri = (process.env.MONGODB_URI || process.env.MONGO_URI || "").trim();
+const mongoDb = (process.env.MONGODB_DB || process.env.MONGO_DB || "vomp").trim();
+
+if (!mongoUri) {
+  throw new Error(
+    "MONGODB_URI is required. Set it to your MongoDB Atlas connection string (never commit it)."
+  );
+}
+if (!mongoDb) {
+  throw new Error("MONGODB_DB must name the MongoDB database to use.");
+}
+
 const seedPassword = process.env.SEED_ADMIN_PASSWORD?.trim() || (isProd ? "" : "Venue@2026");
 const seedEmail = (process.env.SEED_ADMIN_EMAIL || "admin@venueonmyplate.in").trim().toLowerCase();
 
@@ -84,7 +96,11 @@ export const config = {
   adminUrl,
   allowedOrigins: [...new Set([...parseOrigins(process.env.CORS_ORIGINS), ...defaultOrigins])],
   trustProxy: Number(process.env.TRUST_PROXY || 0),
-  dbPath: path.resolve(ROOT, process.env.DB_PATH || "data/vomp.sqlite"),
+  mongoUri,
+  mongoDb,
+  // Retained only for the one-off SQLite → MongoDB migration and health/debug
+  // reporting. The running API never opens this file.
+  legacyDbPath: path.resolve(ROOT, process.env.DB_PATH || "data/vomp.sqlite"),
   uploadsDir: path.resolve(ROOT, process.env.UPLOADS_DIR || "uploads"),
   maxUploadBytes: Number(process.env.MAX_UPLOAD_MB || 8) * 1024 * 1024,
   maxVideoBytes: Number(process.env.MAX_VIDEO_MB || 80) * 1024 * 1024,

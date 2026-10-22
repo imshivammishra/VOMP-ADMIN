@@ -3,8 +3,9 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { Router } from "express";
 import multer from "multer";
-import { nowIso, paginationMeta, sql, uid } from "../db.js";
+import { collections, nowIso, paginationMeta, uid } from "../db.js";
 import { asyncHandler, HttpError, ok, parse, parsePagination } from "../lib/http.js";
+import { like } from "../lib/query.js";
 import { mediaUpdateSchema } from "../lib/schemas.js";
 import { mediaRow } from "../lib/serializers.js";
 import { actorName, logActivity } from "../lib/activity.js";
@@ -97,31 +98,24 @@ export const mediaRouter = Router();
 
 mediaRouter.get(
   "/",
-  asyncHandler((req, res) => {
+  asyncHandler(async (req, res) => {
     const { page, limit, offset } = parsePagination(req.query, { limit: 24, maxLimit: 100 });
-    const where = [];
-    const params = [];
+    const filter = {};
     if (req.query.q) {
-      where.push("(original_name LIKE ? OR alt LIKE ? OR filename LIKE ?)");
-      params.push(`%${req.query.q}%`, `%${req.query.q}%`, `%${req.query.q}%`);
+      filter.$or = ["original_name", "alt", "filename"].map((field) => ({ [field]: like(req.query.q) }));
     }
     const kind = String(req.query.kind || "").trim();
-    if (kind === "image") {
-      where.push("kind IN ('image', 'external')");
-    } else if (kind === "video") {
-      where.push("kind = 'video'");
-    }
-    const clause = where.length ? `WHERE ${where.join(" AND ")}` : "";
-    const total = sql.get(`SELECT COUNT(*) AS count FROM media ${clause}`, ...params).count;
-    const rows = sql.all(
-      `SELECT * FROM media ${clause} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
-      ...params,
-      limit,
-      offset
-    );
+    if (kind === "image") filter.kind = { $in: ["image", "external"] };
+    else if (kind === "video") filter.kind = "video";
+
+    const [total, rows, kindRows] = await Promise.all([
+      collections.media.countDocuments(filter),
+      collections.media.find(filter).sort({ created_at: -1 }).skip(offset).limit(limit).toArray(),
+      collections.media.aggregate([{ $group: { _id: "$kind", count: { $sum: 1 } } }]).toArray(),
+    ]);
     const counts = { all: 0, image: 0, video: 0 };
-    for (const row of sql.all("SELECT kind, COUNT(*) AS count FROM media GROUP BY kind")) {
-      const bucket = row.kind === "video" ? "video" : "image";
+    for (const row of kindRows) {
+      const bucket = row._id === "video" ? "video" : "image";
       counts[bucket] += row.count;
       counts.all += row.count;
     }
@@ -133,7 +127,7 @@ mediaRouter.post(
   "/",
   requireRole("admin", "editor"),
   upload.single("file"),
-  asyncHandler((req, res) => {
+  asyncHandler(async (req, res) => {
     if (!req.file) throw new HttpError(422, "NO_FILE", "Choose an image or video to upload.");
     const detectedMime = detectMime(req.file.path);
     if (!detectedMime || detectedMime !== req.file.mimetype) {
@@ -156,26 +150,24 @@ mediaRouter.post(
     const id = uid("med_");
     const url = `/uploads/library/${req.file.filename}`;
     try {
-      sql.run(
-        `INSERT INTO media (id, filename, original_name, mime, size, url, alt, kind, uploaded_by, created_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      await collections.media.insertOne({
         id,
-        req.file.filename,
-        req.file.originalname,
-        req.file.mimetype,
-        req.file.size,
+        filename: req.file.filename,
+        original_name: req.file.originalname,
+        mime: req.file.mimetype,
+        size: req.file.size,
         url,
-        "",
-        isVideo ? "video" : "image",
-        req.user.name,
-        nowIso()
-      );
+        alt: "",
+        kind: isVideo ? "video" : "image",
+        uploaded_by: req.user.name,
+        created_at: nowIso(),
+      });
     } catch (error) {
       removeFile(req.file.path);
       throw error;
     }
-    const media = mediaRow(sql.get("SELECT * FROM media WHERE id = ?", id));
-    logActivity({
+    const media = mediaRow(await collections.media.findOne({ id }));
+    await logActivity({
       actor: actorName(req),
       action: "media.uploaded",
       entity: "media",
@@ -190,20 +182,20 @@ mediaRouter.post(
 mediaRouter.patch(
   "/:id",
   requireRole("admin", "editor"),
-  asyncHandler((req, res) => {
-    const row = sql.get("SELECT * FROM media WHERE id = ?", req.params.id);
+  asyncHandler(async (req, res) => {
+    const row = await collections.media.findOne({ id: req.params.id });
     if (!row) throw new HttpError(404, "NOT_FOUND", "Media item not found.");
     const input = parse(mediaUpdateSchema)(req.body);
-    sql.run("UPDATE media SET alt = ? WHERE id = ?", input.alt, row.id);
-    ok(res, mediaRow(sql.get("SELECT * FROM media WHERE id = ?", row.id)));
+    await collections.media.updateOne({ id: row.id }, { $set: { alt: input.alt } });
+    ok(res, mediaRow(await collections.media.findOne({ id: row.id })));
   })
 );
 
 mediaRouter.delete(
   "/:id",
   requireRole("admin", "editor"),
-  asyncHandler((req, res) => {
-    const row = sql.get("SELECT * FROM media WHERE id = ?", req.params.id);
+  asyncHandler(async (req, res) => {
+    const row = await collections.media.findOne({ id: req.params.id });
     if (!row) throw new HttpError(404, "NOT_FOUND", "Media item not found.");
     if (row.url.startsWith("/uploads/")) {
       const filePath = path.join(config.uploadsDir, row.url.replace("/uploads/", ""));
@@ -213,8 +205,8 @@ mediaRouter.delete(
         /* already removed */
       }
     }
-    sql.run("DELETE FROM media WHERE id = ?", row.id);
-    logActivity({
+    await collections.media.deleteOne({ id: row.id });
+    await logActivity({
       actor: actorName(req),
       action: "media.deleted",
       entity: "media",

@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { nowIso, paginationMeta, parseJson, sql, uid } from "../db.js";
+import { collections, nowIso, paginationMeta, parseJson, uid } from "../db.js";
 import { asyncHandler, HttpError, ok, parse, parsePagination, toCsv } from "../lib/http.js";
+import { like, groupedCounts } from "../lib/query.js";
 import { bulkEnquirySchema, enquiryUpdateSchema } from "../lib/schemas.js";
 import { enquiryRow } from "../lib/serializers.js";
 import { actorName, logActivity } from "../lib/activity.js";
@@ -10,74 +11,69 @@ export const enquiriesRouter = Router();
 
 const STATUSES = ["new", "contacted", "qualified", "won", "lost", "closed"];
 const SORTS = {
-  newest: "created_at DESC",
-  oldest: "created_at ASC",
-  priority: "CASE priority WHEN 'urgent' THEN 0 WHEN 'high' THEN 1 WHEN 'normal' THEN 2 ELSE 3 END, created_at DESC",
-  updated: "updated_at DESC",
+  newest: { created_at: -1 },
+  oldest: { created_at: 1 },
+  priority: { priority_rank: 1, created_at: -1 },
+  updated: { updated_at: -1 },
 };
 
 function buildFilters(query, { includeStatus = true } = {}) {
-  const where = [];
-  const params = [];
+  const filter = {};
   const q = String(query.q || "").trim();
   if (q) {
-    where.push("(name LIKE ? OR phone LIKE ? OR email LIKE ? OR reference LIKE ? OR city LIKE ? OR message LIKE ?)");
-    const term = `%${q}%`;
-    params.push(term, term, term, term, term, term);
+    filter.$or = ["name", "phone", "email", "reference", "city", "message"].map((field) => ({
+      [field]: like(q),
+    }));
   }
-  if (includeStatus && query.status && query.status !== "all") {
-    where.push("status = ?");
-    params.push(String(query.status));
+  if (includeStatus && query.status && query.status !== "all") filter.status = String(query.status);
+  if (query.source && query.source !== "all") filter.source = String(query.source);
+  if (query.city && query.city !== "all") filter.city = String(query.city);
+  if (query.priority && query.priority !== "all") filter.priority = String(query.priority);
+  if (query.assignee && query.assignee !== "all") filter.assignee = String(query.assignee);
+  if (query.from || query.to) {
+    filter.created_at = {};
+    if (query.from) filter.created_at.$gte = `${String(query.from)}T00:00:00.000Z`;
+    if (query.to) filter.created_at.$lte = `${String(query.to)}T23:59:59.999Z`;
   }
-  if (query.source && query.source !== "all") {
-    where.push("source = ?");
-    params.push(String(query.source));
-  }
-  if (query.city && query.city !== "all") {
-    where.push("city = ?");
-    params.push(String(query.city));
-  }
-  if (query.priority && query.priority !== "all") {
-    where.push("priority = ?");
-    params.push(String(query.priority));
-  }
-  if (query.assignee && query.assignee !== "all") {
-    where.push("assignee = ?");
-    params.push(String(query.assignee));
-  }
-  if (query.from) {
-    where.push("created_at >= ?");
-    params.push(`${String(query.from)}T00:00:00.000Z`);
-  }
-  if (query.to) {
-    where.push("created_at <= ?");
-    params.push(`${String(query.to)}T23:59:59.999Z`);
-  }
-  return { clause: where.length ? `WHERE ${where.join(" AND ")}` : "", params };
+  return filter;
 }
 
 enquiriesRouter.get(
   "/",
-  asyncHandler((req, res) => {
+  asyncHandler(async (req, res) => {
     const { page, limit, offset } = parsePagination(req.query);
-    const { clause, params } = buildFilters(req.query);
-    const order = SORTS[String(req.query.sort || "newest")] || SORTS.newest;
-    const total = sql.get(`SELECT COUNT(*) AS count FROM enquiries ${clause}`, ...params).count;
-    const rows = sql.all(
-      `SELECT * FROM enquiries ${clause} ORDER BY ${order} LIMIT ? OFFSET ?`,
-      ...params,
-      limit,
-      offset
-    );
+    const filter = buildFilters(req.query);
+    const sort = SORTS[String(req.query.sort || "newest")] || SORTS.newest;
+    const [total, rows, statusCounts] = await Promise.all([
+      collections.enquiries.countDocuments(filter),
+      sort.priority_rank
+        ? collections.enquiries
+            .aggregate([
+              { $match: filter },
+              {
+                $addFields: {
+                  priority_rank: {
+                    $switch: {
+                      branches: [
+                        { case: { $eq: ["$priority", "urgent"] }, then: 0 },
+                        { case: { $eq: ["$priority", "high"] }, then: 1 },
+                        { case: { $eq: ["$priority", "normal"] }, then: 2 },
+                      ],
+                      default: 3,
+                    },
+                  },
+                },
+              },
+              { $sort: sort },
+              { $skip: offset },
+              { $limit: limit },
+            ])
+            .toArray()
+        : collections.enquiries.find(filter).sort(sort).skip(offset).limit(limit).toArray(),
+      groupedCounts("enquiries", "status", buildFilters(req.query, { includeStatus: false })),
+    ]);
     const counts = {};
-    for (const status of STATUSES) counts[status] = 0;
-    const countFilters = buildFilters(req.query, { includeStatus: false });
-    for (const row of sql.all(
-      `SELECT status, COUNT(*) AS count FROM enquiries ${countFilters.clause} GROUP BY status`,
-      ...countFilters.params
-    )) {
-      counts[row.status] = row.count;
-    }
+    for (const status of STATUSES) counts[status] = statusCounts[status] || 0;
     counts.all = Object.values(counts).reduce((sum, value) => sum + value, 0);
     ok(res, rows.map(enquiryRow), { ...paginationMeta(total, page, limit), counts });
   })
@@ -85,9 +81,9 @@ enquiriesRouter.get(
 
 enquiriesRouter.get(
   "/export.csv",
-  asyncHandler((req, res) => {
-    const { clause, params } = buildFilters(req.query);
-    const rows = sql.all(`SELECT * FROM enquiries ${clause} ORDER BY created_at DESC`, ...params).map(
+  asyncHandler(async (req, res) => {
+    const filter = buildFilters(req.query);
+    const rows = (await collections.enquiries.find(filter).sort({ created_at: -1 }).toArray()).map(
       enquiryRow
     );
     const csv = toCsv(rows, [
@@ -117,8 +113,8 @@ enquiriesRouter.get(
 
 enquiriesRouter.get(
   "/:id",
-  asyncHandler((req, res) => {
-    const row = sql.get("SELECT * FROM enquiries WHERE id = ?", req.params.id);
+  asyncHandler(async (req, res) => {
+    const row = await collections.enquiries.findOne({ id: req.params.id });
     if (!row) throw new HttpError(404, "NOT_FOUND", "Enquiry not found.");
     ok(res, enquiryRow(row));
   })
@@ -126,33 +122,22 @@ enquiriesRouter.get(
 
 enquiriesRouter.patch(
   "/:id",
-  asyncHandler((req, res) => {
+  asyncHandler(async (req, res) => {
     const input = parse(enquiryUpdateSchema)(req.body);
-    const row = sql.get("SELECT * FROM enquiries WHERE id = ?", req.params.id);
+    const row = await collections.enquiries.findOne({ id: req.params.id });
     if (!row) throw new HttpError(404, "NOT_FOUND", "Enquiry not found.");
 
-    const updates = [];
-    const params = [];
+    const updates = {};
     const now = nowIso();
     let firstResponseAt = row.first_response_at;
 
     if (input.status && input.status !== row.status) {
-      updates.push("status = ?");
-      params.push(input.status);
+      updates.status = input.status;
       if (!firstResponseAt) firstResponseAt = now;
     }
-    if (input.priority) {
-      updates.push("priority = ?");
-      params.push(input.priority);
-    }
-    if (input.assignee !== undefined) {
-      updates.push("assignee = ?");
-      params.push(input.assignee);
-    }
-    if (input.tags) {
-      updates.push("tags = ?");
-      params.push(JSON.stringify(input.tags));
-    }
+    if (input.priority) updates.priority = input.priority;
+    if (input.assignee !== undefined) updates.assignee = input.assignee;
+    if (input.tags) updates.tags = input.tags;
     if (input.note) {
       const notes = parseJson(row.notes, []);
       notes.unshift({
@@ -161,22 +146,18 @@ enquiriesRouter.patch(
         author: actorName(req),
         at: now,
       });
-      updates.push("notes = ?");
-      params.push(JSON.stringify(notes.slice(0, 200)));
+      updates.notes = notes.slice(0, 200);
       if (!firstResponseAt) firstResponseAt = now;
     }
     if (firstResponseAt && firstResponseAt !== row.first_response_at) {
-      updates.push("first_response_at = ?");
-      params.push(firstResponseAt);
+      updates.first_response_at = firstResponseAt;
     }
-    updates.push("updated_at = ?");
-    params.push(now);
-    params.push(row.id);
+    updates.updated_at = now;
 
-    sql.run(`UPDATE enquiries SET ${updates.join(", ")} WHERE id = ?`, ...params);
-    const updated = enquiryRow(sql.get("SELECT * FROM enquiries WHERE id = ?", row.id));
+    await collections.enquiries.updateOne({ id: row.id }, { $set: updates });
+    const updated = enquiryRow(await collections.enquiries.findOne({ id: row.id }));
 
-    logActivity({
+    await logActivity({
       actor: actorName(req),
       action: input.note ? "enquiry.note" : "enquiry.updated",
       entity: "enquiry",
@@ -192,15 +173,14 @@ enquiriesRouter.patch(
 
 enquiriesRouter.post(
   "/bulk",
-  asyncHandler((req, res) => {
+  asyncHandler(async (req, res) => {
     const input = parse(bulkEnquirySchema)(req.body);
     const now = nowIso();
     let changed = 0;
 
     if (input.action === "delete") {
-      const placeholders = input.ids.map(() => "?").join(",");
-      const result = sql.run(`DELETE FROM enquiries WHERE id IN (${placeholders})`, ...input.ids);
-      changed = result.changes;
+      const result = await collections.enquiries.deleteMany({ id: { $in: input.ids } });
+      changed = result.deletedCount;
     } else {
       const column =
         input.action === "status" ? "status" : input.action === "priority" ? "priority" : "assignee";
@@ -211,18 +191,14 @@ enquiriesRouter.post(
       if (input.action === "priority" && !["low", "normal", "high", "urgent"].includes(value)) {
         throw new HttpError(422, "VALIDATION_ERROR", "Unknown priority value.");
       }
-      for (const id of input.ids) {
-        const result = sql.run(
-          `UPDATE enquiries SET ${column} = ?, updated_at = ? WHERE id = ?`,
-          value,
-          now,
-          id
-        );
-        changed += result.changes;
-      }
+      const result = await collections.enquiries.updateMany(
+        { id: { $in: input.ids } },
+        { $set: { [column]: value, updated_at: now } }
+      );
+      changed = result.modifiedCount;
     }
 
-    logActivity({
+    await logActivity({
       actor: actorName(req),
       action: `enquiry.bulk_${input.action}`,
       entity: "enquiry",
@@ -236,11 +212,11 @@ enquiriesRouter.post(
 
 enquiriesRouter.delete(
   "/:id",
-  asyncHandler((req, res) => {
-    const row = sql.get("SELECT * FROM enquiries WHERE id = ?", req.params.id);
+  asyncHandler(async (req, res) => {
+    const row = await collections.enquiries.findOne({ id: req.params.id });
     if (!row) throw new HttpError(404, "NOT_FOUND", "Enquiry not found.");
-    sql.run("DELETE FROM enquiries WHERE id = ?", req.params.id);
-    logActivity({
+    await collections.enquiries.deleteOne({ id: req.params.id });
+    await logActivity({
       actor: actorName(req),
       action: "enquiry.deleted",
       entity: "enquiry",

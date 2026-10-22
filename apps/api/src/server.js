@@ -3,7 +3,7 @@ import cors from "cors";
 import helmet from "helmet";
 import compression from "compression";
 import { config } from "./config.js";
-import { closeDb, nowIso, sql } from "./db.js";
+import { closeDb, ensureIndexes, nowIso, pingDatabase } from "./db.js";
 import { requireAuth } from "./lib/auth.js";
 import {
   corsOptions,
@@ -31,7 +31,8 @@ import { searchRouter } from "./routes/search.js";
 import { healthRouter } from "./routes/health.js";
 import { ensureSeed } from "../seed/seed.js";
 
-const seedResult = ensureSeed();
+await ensureIndexes();
+const seedResult = await ensureSeed();
 
 const app = express();
 app.disable("x-powered-by");
@@ -68,19 +69,22 @@ app.get("/", (_req, res) => {
   });
 });
 
-app.get("/api/health", (_req, res) => {
+app.get("/api/health", async (_req, res) => {
   let database = "ok";
+  let latencyMs = null;
   try {
-    sql.get("SELECT 1 AS ok");
+    latencyMs = await pingDatabase();
   } catch {
     database = "error";
   }
-  res.json({
+  res.status(database === "ok" ? 200 : 503).json({
     ok: database === "ok",
     service: "vomp-api",
     version: config.version,
     environment: config.env,
     database,
+    databaseName: config.mongoDb,
+    latencyMs,
     uptimeSeconds: Math.round(process.uptime()),
     time: nowIso(),
   });
@@ -177,8 +181,8 @@ const server = app.listen(config.port, config.host, () => {
 
 function shutdown(signal) {
   console.log(`\n[api] ${signal} received — closing gracefully…`);
-  server.close(() => {
-    closeDb();
+  server.close(async () => {
+    await closeDb();
     process.exit(0);
   });
   setTimeout(() => process.exit(1), 10_000).unref();

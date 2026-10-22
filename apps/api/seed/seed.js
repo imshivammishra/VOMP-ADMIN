@@ -1,5 +1,5 @@
 import { config } from "../src/config.js";
-import { nowIso, sql, toJson, transaction, uid } from "../src/db.js";
+import { collections, nowIso, uid } from "../src/db.js";
 import { hashPassword } from "../src/lib/auth.js";
 import { saveSettings, SETTINGS_DEFAULTS } from "../src/lib/settings.js";
 import { venues as catalogueVenues, cities as catalogueCities, blogPosts as cataloguePosts } from "./catalogue.mjs";
@@ -10,151 +10,140 @@ function isoDate(value) {
   return Number.isNaN(parsed.getTime()) ? value : parsed.toISOString().slice(0, 10);
 }
 
-function seedCatalogue() {
-  if (sql.get("SELECT COUNT(*) AS count FROM venues").count === 0) {
-    catalogueVenues.forEach((venue, index) => {
-      const id = uid("ven_");
-      const now = nowIso();
-      sql.run(
-        `INSERT INTO venues
-          (id, slug, name, city, city_slug, area, type, setting, capacity_min, capacity_max, price_hint,
-           image, image_alt, short_description, description, amenities, event_types, featured, status,
-           sort_order, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'published', ?, ?, ?)`,
-        id,
-        venue.slug,
-        venue.name,
-        venue.city,
-        venue.citySlug,
-        venue.area || "",
-        venue.type || "",
-        venue.setting || "Indoor",
-        venue.capacityMin || 0,
-        venue.capacityMax || 0,
-        venue.priceHint || "",
-        venue.image || "",
-        venue.imageAlt || "",
-        venue.shortDescription || "",
-        `${venue.shortDescription || ""}\n\n${venue.name} sits in ${venue.area || venue.city}, ${venue.city} and works for ${(venue.eventTypes || []).join(", ") || "celebrations"}.\n\nAsk our team for current availability, a site visit, and commercial terms for your date and guest count.`,
-        toJson(venue.amenities || []),
-        toJson(venue.eventTypes || []),
-        venue.featured ? 1 : 0,
-        index,
-        now,
-        now
-      );
-    });
+async function seedCatalogue() {
+  if ((await collections.venues.countDocuments({})) === 0 && catalogueVenues.length > 0) {
+    const now = nowIso();
+    await collections.venues.insertMany(
+      catalogueVenues.map((venue, index) => ({
+        id: uid("ven_"),
+        slug: venue.slug,
+        name: venue.name,
+        city: venue.city,
+        city_slug: venue.citySlug,
+        area: venue.area || "",
+        type: venue.type || "",
+        setting: venue.setting || "Indoor",
+        capacity_min: venue.capacityMin || 0,
+        capacity_max: venue.capacityMax || 0,
+        price_hint: venue.priceHint || "",
+        image: venue.image || "",
+        image_alt: venue.imageAlt || "",
+        short_description: venue.shortDescription || "",
+        description: `${venue.shortDescription || ""}\n\n${venue.name} sits in ${venue.area || venue.city}, ${venue.city} and works for ${(venue.eventTypes || []).join(", ") || "celebrations"}.\n\nAsk our team for current availability, a site visit, and commercial terms for your date and guest count.`,
+        amenities: venue.amenities || [],
+        event_types: venue.eventTypes || [],
+        featured: Boolean(venue.featured),
+        status: "published",
+        sort_order: index,
+        created_at: now,
+        updated_at: now,
+      }))
+    );
     console.log(`[seed] ${catalogueVenues.length} venues`);
   }
 
-  if (sql.get("SELECT COUNT(*) AS count FROM destinations").count === 0) {
-    catalogueCities.forEach((city) => {
-      const now = nowIso();
-      sql.run(
-        `INSERT INTO destinations
-          (id, slug, name, tagline, description, image, image_alt, venue_count_label, popular_types, status, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'published', ?, ?)`,
-        uid("dst_"),
-        city.slug,
-        city.name,
-        city.tagline || "",
-        city.description || "",
-        city.image || "",
-        city.imageAlt || "",
-        city.venueCountLabel || "",
-        toJson(city.popularTypes || []),
-        now,
-        now
-      );
-    });
+  if ((await collections.destinations.countDocuments({})) === 0) {
+    const now = nowIso();
+    await collections.destinations.insertMany(
+      catalogueCities.map((city) => ({
+        id: uid("dst_"),
+        slug: city.slug,
+        name: city.name,
+        tagline: city.tagline || "",
+        description: city.description || "",
+        image: city.image || "",
+        image_alt: city.imageAlt || "",
+        venue_count_label: city.venueCountLabel || "",
+        popular_types: city.popularTypes || [],
+        status: "published",
+        created_at: now,
+        updated_at: now,
+      }))
+    );
     console.log(`[seed] ${catalogueCities.length} destinations`);
   }
 
-  if (sql.get("SELECT COUNT(*) AS count FROM posts").count === 0) {
-    cataloguePosts.forEach((post) => {
-      const now = nowIso();
-      sql.run(
-        `INSERT INTO posts
-          (id, slug, title, excerpt, category, author, published_on, reading_minutes, image, image_alt, body, status, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'published', ?, ?)`,
-        uid("pst_"),
-        post.slug,
-        post.title,
-        post.excerpt || "",
-        post.category || "Journal",
-        post.author || "Venue On My Plate",
-        isoDate(post.publishedOn),
-        post.readingMinutes || 5,
-        post.image || "",
-        post.imageAlt || "",
-        toJson(post.body || []),
-        now,
-        now
-      );
-    });
+  if ((await collections.posts.countDocuments({})) === 0) {
+    const now = nowIso();
+    await collections.posts.insertMany(
+      cataloguePosts.map((post) => ({
+        id: uid("pst_"),
+        slug: post.slug,
+        title: post.title,
+        excerpt: post.excerpt || "",
+        category: post.category || "Journal",
+        author: post.author || "Venue On My Plate",
+        published_on: isoDate(post.publishedOn),
+        reading_minutes: post.readingMinutes || 5,
+        image: post.image || "",
+        image_alt: post.imageAlt || "",
+        body: post.body || [],
+        status: "published",
+        created_at: now,
+        updated_at: now,
+      }))
+    );
     console.log(`[seed] ${cataloguePosts.length} journal posts`);
   }
 }
 
-function seedSiteContent() {
-  if (sql.get("SELECT COUNT(*) AS count FROM content_blocks").count === 0) {
+async function seedSiteContent() {
+  if ((await collections.content_blocks.countDocuments({})) === 0) {
     const counters = new Map();
-    contentBlocks.forEach((block) => {
-      const order = counters.get(block.section) || 0;
-      counters.set(block.section, order + 10);
-      const now = nowIso();
-      sql.run(
-        `INSERT INTO content_blocks
-          (id, section, block_key, title, subtitle, body, image, image_alt, link_label,
-           link_href, icon, meta, sort_order, status, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'published', ?, ?)`,
-        uid("blk_"),
-        block.section,
-        block.blockKey || "",
-        block.title || "",
-        block.subtitle || "",
-        block.body || "",
-        block.image || "",
-        block.imageAlt || "",
-        block.linkLabel || "",
-        block.linkHref || "",
-        block.icon || "",
-        toJson(block.meta || {}),
-        order,
-        now,
-        now
-      );
-    });
+    const now = nowIso();
+    await collections.content_blocks.insertMany(
+      contentBlocks.map((block) => {
+        const order = counters.get(block.section) || 0;
+        counters.set(block.section, order + 10);
+        return {
+          id: uid("blk_"),
+          section: block.section,
+          block_key: block.blockKey || "",
+          title: block.title || "",
+          subtitle: block.subtitle || "",
+          body: block.body || "",
+          image: block.image || "",
+          image_alt: block.imageAlt || "",
+          link_label: block.linkLabel || "",
+          link_href: block.linkHref || "",
+          icon: block.icon || "",
+          meta: block.meta || {},
+          sort_order: order,
+          status: "published",
+          created_at: now,
+          updated_at: now,
+        };
+      })
+    );
     console.log("[seed] website content");
   }
 }
 
-export function ensureSeed() {
-  return transaction(() => {
-    let created = false;
+export async function ensureSeed() {
+  let created = false;
 
-    if (sql.get("SELECT COUNT(*) AS count FROM users").count === 0) {
-      const now = nowIso();
-      sql.run(
-        `INSERT INTO users (id, email, name, role, password_hash, status, created_at, last_login_at)
-         VALUES (?, ?, ?, 'admin', ?, 'active', ?, NULL)`,
-        uid("usr_"),
-        config.seedAdmin.email,
-        config.seedAdmin.name,
-        hashPassword(config.seedAdmin.password),
-        now
-      );
-      created = true;
-      console.log(`[seed] admin ${config.seedAdmin.email}`);
-    }
+  if ((await collections.users.countDocuments({})) === 0) {
+    const now = nowIso();
+    await collections.users.insertOne({
+      id: uid("usr_"),
+      email: config.seedAdmin.email,
+      name: config.seedAdmin.name,
+      role: "admin",
+      password_hash: hashPassword(config.seedAdmin.password),
+      status: "active",
+      created_at: now,
+      last_login_at: null,
+    });
+    created = true;
+    console.log(`[seed] admin ${config.seedAdmin.email}`);
+  }
 
-    seedCatalogue();
-    seedSiteContent();
+  await seedCatalogue();
+  await seedSiteContent();
 
-    if (sql.get("SELECT COUNT(*) AS count FROM settings").count === 0) {
-      saveSettings(SETTINGS_DEFAULTS);
-    }
+  if ((await collections.settings.countDocuments({})) === 0) {
+    await saveSettings(SETTINGS_DEFAULTS);
+  }
 
-    return { created, email: config.seedAdmin.email };
-  });
+  return { created, email: config.seedAdmin.email };
 }

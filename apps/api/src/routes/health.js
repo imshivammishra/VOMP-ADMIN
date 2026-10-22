@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { Router } from "express";
-import { sql } from "../db.js";
+import { collections, pingDatabase } from "../db.js";
 import { asyncHandler, ok } from "../lib/http.js";
 import { config } from "../config.js";
 import { realtimeStats } from "../lib/realtime.js";
@@ -70,40 +70,29 @@ healthRouter.get(
   asyncHandler(async (_req, res) => {
     const dbStarted = performance.now();
     let dbStatus = "healthy";
-    let quickCheck = "ok";
+    let dbLatency = 0;
     try {
-      const result = sql.get("PRAGMA quick_check");
-      quickCheck = Object.values(result || {})[0] || "ok";
+      dbLatency = await pingDatabase();
     } catch {
       dbStatus = "degraded";
-      quickCheck = "failed";
     }
-    const dbLatency = Math.max(1, Math.round(performance.now() - dbStarted));
-
-    const dbFiles = [config.dbPath, `${config.dbPath}-wal`, `${config.dbPath}-shm`].filter((file) =>
-      fs.existsSync(file)
-    );
-    const dbBytes = dbFiles.reduce((sum, file) => {
-      try {
-        return sum + fs.statSync(file).size;
-      } catch {
-        return sum;
-      }
-    }, 0);
+    if (!dbLatency) dbLatency = Math.max(1, Math.round(performance.now() - dbStarted));
 
     const storage = dirStats(config.uploadsDir);
     const [frontend, admin] = await Promise.all([probe(config.frontendUrl), probe(config.adminUrl)]);
 
-    const counts = {
-      enquiries: sql.get("SELECT COUNT(*) AS count FROM enquiries").count,
-      threads: sql.get("SELECT COUNT(*) AS count FROM threads").count,
-      messages: sql.get("SELECT COUNT(*) AS count FROM messages").count,
-      venues: sql.get("SELECT COUNT(*) AS count FROM venues").count,
-      posts: sql.get("SELECT COUNT(*) AS count FROM posts").count,
-      partners: sql.get("SELECT COUNT(*) AS count FROM partners").count,
-      users: sql.get("SELECT COUNT(*) AS count FROM users").count,
-      media: sql.get("SELECT COUNT(*) AS count FROM media").count,
-    };
+    const count = (name) => collections[name].countDocuments({});
+    const [enquiries, threads, messages, venues, posts, partners, users, media] =
+      await Promise.all([
+        count("enquiries"),
+        count("threads"),
+        count("messages"),
+        count("venues"),
+        count("posts"),
+        count("partners"),
+        count("users"),
+        count("media"),
+      ]);
 
     const services = [
       {
@@ -118,13 +107,13 @@ healthRouter.get(
       },
       {
         key: "database",
-        label: "SQLite database",
-        host: path.basename(config.dbPath),
+        label: "MongoDB Atlas",
+        host: config.mongoDb,
         url: "",
         status: dbStatus,
         latencyMs: dbLatency,
-        message: `quick_check: ${quickCheck} · WAL`,
-        meta: `${(dbBytes / 1024 / 1024).toFixed(2)} MB`,
+        message: dbStatus === "healthy" ? "Atlas ping succeeded" : "Atlas ping failed",
+        meta: "managed cluster",
       },
       {
         key: "storage",
@@ -165,13 +154,12 @@ healthRouter.get(
     ok(res, {
       checkedAt: new Date().toISOString(),
       services,
-      counts,
+      counts: { enquiries, threads, messages, venues, posts, partners, users, media },
       database: {
-        path: config.dbPath,
-        bytes: dbBytes,
-        quickCheck,
+        driver: "mongodb",
+        name: config.mongoDb,
+        status: dbStatus,
         latencyMs: dbLatency,
-        journalMode: sql.get("PRAGMA journal_mode")?.journal_mode || "wal",
       },
       storage: {
         path: config.uploadsDir,

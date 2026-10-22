@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { nowIso, sql, uid } from "../db.js";
+import { collections, nowIso } from "../db.js";
 import { asyncHandler, ok, parse } from "../lib/http.js";
 import { changePasswordSchema, loginSchema } from "../lib/schemas.js";
 import {
@@ -49,7 +49,7 @@ function recordFailure(key) {
 
 authRouter.post(
   "/login",
-  asyncHandler((req, res) => {
+  asyncHandler(async (req, res) => {
     const input = parse(loginSchema)(req.body);
     const key = attemptKey(req, input.email);
     if (tooMany(key)) {
@@ -61,7 +61,7 @@ authRouter.post(
       });
     }
 
-    const row = sql.get("SELECT * FROM users WHERE email = ?", input.email);
+    const row = await collections.users.findOne({ email: input.email });
     const valid = verifyPassword(input.password, row?.password_hash || DUMMY_HASH);
     if (!row || !valid) {
       recordFailure(key);
@@ -76,10 +76,10 @@ authRouter.post(
     }
 
     attempts.delete(key);
-    const session = createSession(row.id, req);
-    sql.run("UPDATE users SET last_login_at = ? WHERE id = ?", nowIso(), row.id);
+    const session = await createSession(row.id, req);
+    await collections.users.updateOne({ id: row.id }, { $set: { last_login_at: nowIso() } });
     res.setHeader("Set-Cookie", sessionCookie(session.token, session.expiresAt));
-    logActivity({
+    await logActivity({
       actor: row.name,
       action: "auth.login",
       entity: "user",
@@ -97,10 +97,10 @@ authRouter.post(
 authRouter.post(
   "/logout",
   requireAuth,
-  asyncHandler((req, res) => {
-    revokeSession(req.session.sessionId);
+  asyncHandler(async (req, res) => {
+    await revokeSession(req.session.sessionId);
     res.setHeader("Set-Cookie", clearSessionCookie());
-    logActivity({
+    await logActivity({
       actor: req.user.name,
       action: "auth.logout",
       entity: "user",
@@ -125,10 +125,10 @@ authRouter.get(
 authRouter.post(
   "/change-password",
   requireAuth,
-  asyncHandler((req, res) => {
+  asyncHandler(async (req, res) => {
     const input = parse(changePasswordSchema)(req.body);
-    const row = sql.get("SELECT * FROM users WHERE id = ?", req.user.id);
-    if (!verifyPassword(input.currentPassword, row.password_hash)) {
+    const row = await collections.users.findOne({ id: req.user.id });
+    if (!row || !verifyPassword(input.currentPassword, row.password_hash)) {
       return res.status(400).json({
         error: { code: "INVALID_PASSWORD", message: "Current password is incorrect." },
       });
@@ -138,9 +138,12 @@ authRouter.post(
         error: { code: "WEAK_PASSWORD", message: "Choose a password you have not used here before." },
       });
     }
-    sql.run("UPDATE users SET password_hash = ? WHERE id = ?", hashPassword(input.newPassword), req.user.id);
-    revokeAllSessions(req.user.id, req.session.sessionId);
-    logActivity({
+    await collections.users.updateOne(
+      { id: req.user.id },
+      { $set: { password_hash: hashPassword(input.newPassword) } }
+    );
+    await revokeAllSessions(req.user.id, req.session.sessionId);
+    await logActivity({
       actor: req.user.name,
       action: "auth.password_changed",
       entity: "user",
@@ -154,10 +157,10 @@ authRouter.post(
 authRouter.post(
   "/logout-all",
   requireAuth,
-  asyncHandler((req, res) => {
-    revokeAllSessions(req.user.id);
+  asyncHandler(async (req, res) => {
+    await revokeAllSessions(req.user.id);
     res.setHeader("Set-Cookie", clearSessionCookie());
-    logActivity({
+    await logActivity({
       actor: req.user.name,
       action: "auth.sessions_revoked",
       entity: "user",
@@ -171,12 +174,11 @@ authRouter.post(
 authRouter.get(
   "/sessions",
   requireAuth,
-  asyncHandler((req, res) => {
-    const rows = sql.all(
-      `SELECT id, created_at, expires_at, last_seen_at, ip, user_agent
-         FROM sessions WHERE user_id = ? ORDER BY last_seen_at DESC`,
-      req.user.id
-    );
+  asyncHandler(async (req, res) => {
+    const rows = await collections.sessions
+      .find({ user_id: req.user.id })
+      .sort({ last_seen_at: -1 })
+      .toArray();
     ok(
       res,
       rows.map((row) => ({
@@ -195,27 +197,26 @@ authRouter.get(
 authRouter.delete(
   "/sessions/:id",
   requireAuth,
-  asyncHandler((req, res) => {
+  asyncHandler(async (req, res) => {
     if (req.params.id === req.session.sessionId) {
       return res.status(400).json({
         error: { code: "CURRENT_SESSION", message: "Use sign out to end your current session." },
       });
     }
-    revokeSession(req.params.id);
-    logActivity({
+    await revokeSession(req.params.id);
+    await logActivity({
       actor: req.user.name,
       action: "auth.session_revoked",
       entity: "session",
       entityId: req.params.id,
       detail: "Session revoked",
     });
-    ok(res, { ok: true });
+    return ok(res, { ok: true });
   })
 );
 
 // Housekeeping: drop expired sessions whenever auth routes are exercised.
-function prune() {
-  const now = nowIso();
-  sql.run("DELETE FROM sessions WHERE expires_at <= ?", now);
+async function prune() {
+  await collections.sessions.deleteMany({ expires_at: { $lte: nowIso() } });
 }
-setInterval(prune, 30 * 60 * 1000).unref();
+setInterval(() => prune().catch((error) => console.error("[api] session prune failed", error)), 30 * 60 * 1000).unref();

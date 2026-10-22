@@ -1,7 +1,8 @@
 import { Router } from "express";
 import { z } from "zod";
-import { nowIso, paginationMeta, sql, uid, uniqueReference } from "../db.js";
+import { collections, nowIso, paginationMeta, uid, uniqueReference } from "../db.js";
 import { asyncHandler, HttpError, ok, parse, parsePagination } from "../lib/http.js";
+import { like, groupedCounts, attachLastMessages } from "../lib/query.js";
 import { adminMessageSchema, threadUpdateSchema } from "../lib/schemas.js";
 import { messageRow, threadRow } from "../lib/serializers.js";
 import { actorName, logActivity } from "../lib/activity.js";
@@ -11,60 +12,49 @@ import { broadcast } from "../lib/realtime.js";
 export const threadsRouter = Router();
 
 const STATUSES = ["open", "waiting", "resolved"];
-const threadListSelect = `SELECT t.*,
-  (SELECT body FROM messages m WHERE m.thread_id = t.id ORDER BY m.created_at DESC LIMIT 1) AS last_message
-  FROM threads t`;
 
 threadsRouter.get(
   "/",
-  asyncHandler((req, res) => {
+  asyncHandler(async (req, res) => {
     const { page, limit, offset } = parsePagination(req.query, { limit: 30 });
-    const where = [];
-    const params = [];
+    const filter = {};
     const q = String(req.query.q || "").trim();
     if (q) {
-      where.push("(t.customer_name LIKE ? OR t.phone LIKE ? OR t.reference LIKE ? OR t.city LIKE ? OR t.email LIKE ?)");
-      const term = `%${q}%`;
-      params.push(term, term, term, term, term);
+      filter.$or = ["customer_name", "phone", "reference", "city", "email"].map((field) => ({
+        [field]: like(q),
+      }));
     }
-    if (req.query.status && req.query.status !== "all") {
-      where.push("t.status = ?");
-      params.push(String(req.query.status));
-    }
-    if (req.query.assignee && req.query.assignee !== "all") {
-      where.push("t.assignee = ?");
-      params.push(String(req.query.assignee));
-    }
-    const clause = where.length ? `WHERE ${where.join(" AND ")}` : "";
-    const total = sql.get(`SELECT COUNT(*) AS count FROM threads t ${clause}`, ...params).count;
-    const rows = sql.all(
-      `${threadListSelect} ${clause} ORDER BY t.last_message_at DESC LIMIT ? OFFSET ?`,
-      ...params,
-      limit,
-      offset
-    );
+    if (req.query.status && req.query.status !== "all") filter.status = String(req.query.status);
+    if (req.query.assignee && req.query.assignee !== "all") filter.assignee = String(req.query.assignee);
+
+    const [total, rows, statusCounts, unreadAgg] = await Promise.all([
+      collections.threads.countDocuments(filter),
+      collections.threads.find(filter).sort({ last_message_at: -1 }).skip(offset).limit(limit).toArray(),
+      groupedCounts("threads", "status"),
+      collections.threads
+        .aggregate([{ $group: { _id: null, count: { $sum: "$unread_admin" } } }])
+        .toArray(),
+    ]);
     const counts = { all: 0 };
-    for (const status of STATUSES) counts[status] = 0;
-    for (const row of sql.all("SELECT status, COUNT(*) AS count FROM threads GROUP BY status")) {
-      counts[row.status] = row.count;
-      counts.all += row.count;
-    }
-    const unread = sql.get("SELECT COALESCE(SUM(unread_admin), 0) AS count FROM threads").count;
-    ok(res, rows.map(threadRow), { ...paginationMeta(total, page, limit), counts, unread });
+    for (const status of STATUSES) counts[status] = statusCounts[status] || 0;
+    counts.all = Object.values(counts).reduce((sum, value) => sum + value, 0);
+    const unread = unreadAgg[0]?.count || 0;
+    const withMessages = await attachLastMessages(rows);
+    ok(res, withMessages.map(threadRow), { ...paginationMeta(total, page, limit), counts, unread });
   })
 );
 
 threadsRouter.get(
   "/:id",
-  asyncHandler((req, res) => {
-    const thread = sql.get("SELECT * FROM threads WHERE id = ?", req.params.id);
+  asyncHandler(async (req, res) => {
+    const thread = await collections.threads.findOne({ id: req.params.id });
     if (!thread) throw new HttpError(404, "NOT_FOUND", "Conversation not found.");
-    const messages = sql
-      .all("SELECT * FROM messages WHERE thread_id = ? ORDER BY created_at ASC", thread.id)
-      .map(messageRow);
-    const enquiry = sql.get(
-      "SELECT id, reference, status FROM enquiries WHERE phone = ? ORDER BY created_at DESC LIMIT 1",
-      thread.phone
+    const messages = (await collections.messages.find({ thread_id: thread.id }).sort({ created_at: 1 }).toArray()).map(
+      messageRow
+    );
+    const enquiry = await collections.enquiries.findOne(
+      { phone: thread.phone },
+      { sort: { created_at: -1 }, projection: { id: 1, reference: 1, status: 1 } }
     );
     ok(res, {
       thread: threadRow({ ...thread, last_message: messages.at(-1)?.body || "" }),
@@ -76,39 +66,28 @@ threadsRouter.get(
 
 threadsRouter.patch(
   "/:id",
-  asyncHandler((req, res) => {
+  asyncHandler(async (req, res) => {
     const input = parse(threadUpdateSchema)(req.body);
-    const thread = sql.get("SELECT * FROM threads WHERE id = ?", req.params.id);
+    const thread = await collections.threads.findOne({ id: req.params.id });
     if (!thread) throw new HttpError(404, "NOT_FOUND", "Conversation not found.");
     const now = nowIso();
-    const updates = [];
-    const params = [];
-    if (input.status) {
-      updates.push("status = ?");
-      params.push(input.status);
-    }
-    if (input.assignee !== undefined) {
-      updates.push("assignee = ?");
-      params.push(input.assignee);
-    }
+    const updates = {};
+    if (input.status) updates.status = input.status;
+    if (input.assignee !== undefined) updates.assignee = input.assignee;
     if (input.unreadAdmin !== undefined) {
-      updates.push("unread_admin = ?");
-      params.push(input.unreadAdmin);
+      updates.unread_admin = input.unreadAdmin;
       if (input.unreadAdmin === 0) {
-        sql.run(
-          "UPDATE messages SET read_at = ? WHERE thread_id = ? AND sender = 'customer' AND read_at IS NULL",
-          now,
-          thread.id
+        await collections.messages.updateMany(
+          { thread_id: thread.id, sender: "customer", read_at: null },
+          { $set: { read_at: now } }
         );
       }
     }
-    updates.push("updated_at = ?");
-    params.push(now);
-    params.push(thread.id);
-    sql.run(`UPDATE threads SET ${updates.join(", ")} WHERE id = ?`, ...params);
+    updates.updated_at = now;
+    await collections.threads.updateOne({ id: thread.id }, { $set: updates });
 
-    const updated = threadRow(sql.get("SELECT * FROM threads WHERE id = ?", thread.id));
-    logActivity({
+    const updated = threadRow(await collections.threads.findOne({ id: thread.id }));
+    await logActivity({
       actor: actorName(req),
       action: "thread.updated",
       entity: "thread",
@@ -122,15 +101,17 @@ threadsRouter.patch(
 
 threadsRouter.post(
   "/:id/read",
-  asyncHandler((req, res) => {
-    const thread = sql.get("SELECT * FROM threads WHERE id = ?", req.params.id);
+  asyncHandler(async (req, res) => {
+    const thread = await collections.threads.findOne({ id: req.params.id });
     if (!thread) throw new HttpError(404, "NOT_FOUND", "Conversation not found.");
     const now = nowIso();
-    sql.run("UPDATE threads SET unread_admin = 0, updated_at = ? WHERE id = ?", now, thread.id);
-    sql.run(
-      "UPDATE messages SET read_at = ? WHERE thread_id = ? AND sender = 'customer' AND read_at IS NULL",
-      now,
-      thread.id
+    await collections.threads.updateOne(
+      { id: thread.id },
+      { $set: { unread_admin: 0, updated_at: now } }
+    );
+    await collections.messages.updateMany(
+      { thread_id: thread.id, sender: "customer", read_at: null },
+      { $set: { read_at: now } }
     );
     broadcast("thread:read", { threadId: thread.id });
     ok(res, { ok: true });
@@ -139,22 +120,25 @@ threadsRouter.post(
 
 threadsRouter.post(
   "/:id/messages",
-  asyncHandler((req, res) => {
+  asyncHandler(async (req, res) => {
     const input = parse(adminMessageSchema)(req.body);
-    const thread = sql.get("SELECT * FROM threads WHERE id = ?", req.params.id);
+    const thread = await collections.threads.findOne({ id: req.params.id });
     if (!thread) throw new HttpError(404, "NOT_FOUND", "Conversation not found.");
-    const message = appendAdminMessage(thread, input.body, req.user);
+    const message = await appendAdminMessage(thread, input.body, req.user);
     ok(res, message, undefined, 201);
   })
 );
 
 threadsRouter.delete(
   "/:id",
-  asyncHandler((req, res) => {
-    const thread = sql.get("SELECT * FROM threads WHERE id = ?", req.params.id);
+  asyncHandler(async (req, res) => {
+    const thread = await collections.threads.findOne({ id: req.params.id });
     if (!thread) throw new HttpError(404, "NOT_FOUND", "Conversation not found.");
-    sql.run("DELETE FROM threads WHERE id = ?", thread.id);
-    logActivity({
+    await Promise.all([
+      collections.threads.deleteOne({ id: thread.id }),
+      collections.messages.deleteMany({ thread_id: thread.id }),
+    ]);
+    await logActivity({
       actor: actorName(req),
       action: "thread.deleted",
       entity: "thread",
@@ -176,41 +160,42 @@ const newThreadSchema = z.object({
 
 threadsRouter.post(
   "/",
-  asyncHandler((req, res) => {
+  asyncHandler(async (req, res) => {
     const input = parse(newThreadSchema)(req.body);
     const now = nowIso();
     const id = uid("thr_");
-    sql.run(
-      `INSERT INTO threads
-        (id, reference, customer_name, phone, email, city, channel, status, assignee,
-         unread_admin, unread_customer, last_message_at, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, 'manual', 'open', ?, 0, 0, ?, ?, ?)`,
+    await collections.threads.insertOne({
       id,
-      uniqueReference("threads", "THR"),
-      input.customerName,
-      input.phone,
-      input.email || "",
-      input.city,
-      req.user.name,
-      now,
-      now,
-      now
-    );
+      reference: await uniqueReference("threads", "THR"),
+      customer_name: input.customerName,
+      phone: input.phone,
+      email: input.email || "",
+      city: input.city,
+      channel: "manual",
+      status: "open",
+      assignee: req.user.name,
+      unread_admin: 0,
+      unread_customer: 0,
+      last_message_at: now,
+      created_at: now,
+      updated_at: now,
+    });
     const messageId = uid("msg_");
-    sql.run(
-      `INSERT INTO messages (id, thread_id, sender, body, meta, created_at, read_at)
-       VALUES (?, ?, 'admin', ?, ?, ?, ?)`,
-      messageId,
-      id,
-      input.message,
-      JSON.stringify({ author: req.user.name, userId: req.user.id }),
-      now,
-      now
-    );
-    const thread = threadRow(
-      sql.get(`${threadListSelect} WHERE t.id = ?`, id)
-    );
-    logActivity({
+    await collections.messages.insertOne({
+      id: messageId,
+      thread_id: id,
+      sender: "admin",
+      body: input.message,
+      meta: { author: req.user.name, userId: req.user.id },
+      created_at: now,
+      read_at: now,
+    });
+    const lastMessage = await collections.messages.findOne({ id: messageId });
+    const thread = threadRow({
+      ...(await collections.threads.findOne({ id })),
+      last_message: lastMessage?.body || "",
+    });
+    await logActivity({
       actor: req.user.name,
       action: "thread.created",
       entity: "thread",
@@ -218,6 +203,11 @@ threadsRouter.post(
       detail: `${thread.reference} · ${input.customerName}`,
     });
     broadcast("thread:new", { thread });
-    ok(res, { thread, message: messageRow(sql.get("SELECT * FROM messages WHERE id = ?", messageId)) }, undefined, 201);
+    ok(
+      res,
+      { thread, message: messageRow(lastMessage) },
+      undefined,
+      201
+    );
   })
 );

@@ -1,4 +1,4 @@
-import { nowIso, parseJson, sql } from "../db.js";
+import { collections, nowIso, parseJson } from "../db.js";
 import { config } from "../config.js";
 
 export const SETTINGS_DEFAULTS = {
@@ -36,33 +36,33 @@ export const SETTINGS_DEFAULTS = {
   },
 };
 
-export function getSettings() {
+export async function getSettings() {
   const output = structuredClone(SETTINGS_DEFAULTS);
-  for (const row of sql.all("SELECT key, value FROM settings")) {
-    if (row.key in output) {
-      output[row.key] = { ...output[row.key], ...parseJson(row.value, {}) };
+  const rows = await collections.settings.find({}).toArray();
+  for (const row of rows) {
+    const key = row.key || row._id;
+    if (key in output) {
+      output[key] = { ...output[key], ...parseJson(row.value, {}) };
     }
   }
   return output;
 }
 
-export function getSetting(key) {
-  return getSettings()[key] ?? null;
+export async function getSetting(key) {
+  return (await getSettings())[key] ?? null;
 }
 
-export function saveSettings(patch) {
+export async function saveSettings(patch) {
   const now = nowIso();
-  const current = getSettings();
+  const current = await getSettings();
   const next = { ...current };
   for (const [key, value] of Object.entries(patch)) {
     if (!(key in SETTINGS_DEFAULTS)) continue;
     next[key] = { ...(current[key] || {}), ...value };
-    sql.run(
-      `INSERT INTO settings (key, value, updated_at) VALUES (?, ?, ?)
-       ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at`,
-      key,
-      JSON.stringify(next[key]),
-      now
+    await collections.settings.updateOne(
+      { _id: key },
+      { $set: { key, value: next[key], updated_at: now } },
+      { upsert: true }
     );
   }
   return next;
