@@ -86,16 +86,21 @@ app.get("/api/health", (_req, res) => {
   });
 });
 
-// Public traffic: forgiving but bounded.
-app.use("/api", rateLimit({ windowMs: 60_000, max: 600, keyPrefix: "global" }));
-app.use(
-  "/api",
-  rateLimit({
-    windowMs: 60_000,
-    max: 120,
-    keyPrefix: "write",
-  })
-);
+// Public traffic: forgiving but bounded. The API only listens on loopback and
+// the website/admin proxies share that address, so the read ceiling must cover
+// server-side rendering builds and normal proxied traffic alike.
+app.use("/api", rateLimit({ windowMs: 60_000, max: 6000, keyPrefix: "global" }));
+const writeLimiter = rateLimit({
+  windowMs: 60_000,
+  max: 120,
+  keyPrefix: "write",
+});
+app.use("/api", (req, res, next) => {
+  if (req.method === "GET" || req.method === "HEAD" || req.method === "OPTIONS") {
+    return next();
+  }
+  return writeLimiter(req, res, next);
+});
 
 app.use("/api/v1/public", publicRouter);
 app.use("/api", legacyRouter);

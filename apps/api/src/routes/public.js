@@ -30,7 +30,7 @@ publicRouter.get(
       params.push(`%${String(event)}%`);
     }
     if (featured === "true") where.push("featured = 1");
-    const max = Math.min(200, Math.max(1, Number(limit) || 200));
+    const max = Math.min(500, Math.max(1, Number(limit) || 500));
     const rows = sql.all(
       `SELECT * FROM venues WHERE ${where.join(" AND ")}
        ORDER BY featured DESC, sort_order ASC, name ASC LIMIT ?`,
