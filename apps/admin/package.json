@@ -4,9 +4,9 @@
   "private": true,
   "description": "Venue On My Plate — operations console",
   "scripts": {
-    "dev": "next dev -p 3002",
+    "dev": "next dev -p 3102",
     "build": "next build",
-    "start": "next start -p 3002",
+    "start": "next start -p 3102",
     "typecheck": "tsc --noEmit",
     "lint": "eslint ."
   },

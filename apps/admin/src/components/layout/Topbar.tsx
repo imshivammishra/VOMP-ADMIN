@@ -140,7 +140,7 @@ export function Topbar({
         </span>
 
         <Link
-          href={process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}
+          href={process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3100"}
           target="_blank"
           rel="noreferrer"
           title="Open the public website"

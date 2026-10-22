@@ -43,3 +43,7 @@ jobs:
         run: npm run build --workspace @vomp/admin
         env:
           NEXT_TELEMETRY_DISABLED: "1"
+          NEXT_PUBLIC_API_URL: /
+          API_INTERNAL_URL: http://127.0.0.1:3101
+          NEXT_PUBLIC_SITE_URL: https://venueonmyplate.in
+          CSP_UPGRADE_INSECURE_REQUESTS: "0"

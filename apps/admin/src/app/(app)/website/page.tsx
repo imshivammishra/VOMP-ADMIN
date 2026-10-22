@@ -435,7 +435,7 @@ export default function WebsiteContentPage() {
         actions={
           <>
             <Link
-              href={process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}
+              href={process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3100"}
               target="_blank"
               rel="noreferrer"
               className="inline-flex h-10 items-center gap-2 rounded-lg border border-line-strong bg-white px-4 text-[12px] font-semibold text-ink transition hover:border-ink hover:bg-cream-soft"

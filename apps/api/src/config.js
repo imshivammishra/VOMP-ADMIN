@@ -8,10 +8,15 @@ export const ROOT = path.resolve(here, "..");
 
 const env = process.env.NODE_ENV || "development";
 const isProd = env === "production";
-const port = Number(process.env.PORT || 8081);
+const port = Number(process.env.PORT || 3101);
 
 function cleanUrl(value, fallback) {
   return (value || fallback).replace(/\/+$/, "");
+}
+
+function parseBoolean(value, fallback) {
+  if (value === undefined || value === null || value === "") return fallback;
+  return ["1", "true", "yes", "on"].includes(String(value).trim().toLowerCase());
 }
 
 function parseOrigins(value) {
@@ -21,8 +26,8 @@ function parseOrigins(value) {
     .filter(Boolean);
 }
 
-const frontendUrl = cleanUrl(process.env.FRONTEND_URL, "http://localhost:3000");
-const adminUrl = cleanUrl(process.env.ADMIN_URL, "http://localhost:3002");
+const frontendUrl = cleanUrl(process.env.FRONTEND_URL, "http://localhost:3100");
+const adminUrl = cleanUrl(process.env.ADMIN_URL, "http://localhost:3102");
 const apiPublicUrl = cleanUrl(process.env.API_PUBLIC_URL, `http://localhost:${port}`);
 
 const seedPassword = process.env.SEED_ADMIN_PASSWORD?.trim() || (isProd ? "" : "Venue@2026");
@@ -60,7 +65,7 @@ const localOrigins = [
   adminUrl,
   apiPublicUrl,
   ...[...localHosts].flatMap((host) =>
-    [3000, 3001, 3002].map((port) => `http://${host}:${port}`)
+    [3000, 3001, 3002, 3100, 3101, 3102].map((port) => `http://${host}:${port}`)
   ),
 ];
 
@@ -87,7 +92,9 @@ export const config = {
   cookie: {
     name: "vomp_admin_session",
     domain: process.env.COOKIE_DOMAIN || undefined,
-    secure: isProd,
+    // Secure cookies are required behind HTTPS. Allow an explicit opt-out for
+    // temporary HTTP/IP testing; never rely on this for a public deployment.
+    secure: parseBoolean(process.env.COOKIE_SECURE, isProd),
   },
   seedAdmin: {
     name: process.env.SEED_ADMIN_NAME || "Administrator",
@@ -95,3 +102,9 @@ export const config = {
     password: seedPassword,
   },
 };
+
+if (isProd && !config.cookie.secure) {
+  console.warn(
+    "[api] COOKIE_SECURE=false — session cookies are not marked Secure. Use this only for temporary HTTP testing and enable HTTPS as soon as possible."
+  );
+}

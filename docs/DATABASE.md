@@ -9,10 +9,10 @@ and no separate database server to secure on the VPS.
 | Environment | Path |
 | --- | --- |
 | Local | `apps/api/data/vomp.sqlite` |
-| Production | `/var/www/vomp/shared/data/vomp.sqlite` |
+| Production | `/opt/vomp-deploy/shared/data/vomp.sqlite` |
 
 Production data, uploads, backups and env files live outside the Git working
-trees under `/var/www/vomp/shared/`, so deploys never overwrite them.
+trees under `/opt/vomp-deploy/shared/`, so deploys never overwrite them.
 
 ## Tables
 
@@ -60,28 +60,28 @@ For a schema change:
 ## Backup
 
 ```bash
-sudo -u vomp bash /var/www/vomp/workspace/deploy/scripts/backup.sh
+sudo -u adarsharma bash /opt/vomp-deploy/admin-backend/deploy/scripts/backup.sh
 ```
 
 The script uses SQLite's online `.backup` command to produce a consistent copy,
-then gzips it into `/var/www/vomp/shared/backups/`. It retains 14 days by
+then gzips it into `/opt/vomp-deploy/shared/backups/`. It retains 14 days by
 default. Copy backups off the VPS as well.
 
 ## Restore
 
 ```bash
-sudo -u vomp pm2 stop vomp-api
-sudo -u vomp cp /var/www/vomp/shared/backups/vomp-YYYY-MM-DD.sqlite.gz /tmp/restore.sqlite.gz
-sudo -u vomp gunzip -f /tmp/restore.sqlite.gz
-sudo -u vomp cp /tmp/restore.sqlite /var/www/vomp/shared/data/vomp.sqlite
-sudo -u vomp pm2 start vomp-api
+sudo -u adarsharma pm2 stop VOMP-API
+sudo -u adarsharma cp /opt/vomp-deploy/shared/backups/vomp-YYYY-MM-DD.sqlite.gz /tmp/restore.sqlite.gz
+sudo -u adarsharma gunzip -f /tmp/restore.sqlite.gz
+sudo -u adarsharma cp /tmp/restore.sqlite /opt/vomp-deploy/shared/data/vomp.sqlite
+sudo -u adarsharma pm2 start VOMP-API
 ```
 
 Remove stale `-wal` and `-shm` files while the API is stopped if restoring over
 an existing database. Verify with:
 
 ```bash
-sudo -u vomp sqlite3 /var/www/vomp/shared/data/vomp.sqlite "PRAGMA quick_check;"
+sudo -u adarsharma sqlite3 /opt/vomp-deploy/shared/data/vomp.sqlite "PRAGMA quick_check;"
 ```
 
 ## Operational queries

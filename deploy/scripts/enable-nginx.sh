@@ -1,18 +1,21 @@
 #!/usr/bin/env bash
-# Install the Nginx reverse proxy and obtain HTTPS certificates.
-# Run as root after DNS points to the VPS.
+# OPTIONAL HTTPS SETUP — GUARDED.
+# This installs a new Nginx site and removes the default site. Do not run it on
+# the current VPS until DNS points at the server and you have backed up Nginx;
+# the machine already serves other Nginx sites.
+#
+# Current VOMP deployment uses direct ports 3100/3102. See
+# deploy/VOMP-DEPLOYMENT-GUIDE.md before enabling Nginx.
 #
 # Production (two hosts, same-origin API):
-#   sudo DOMAIN=venueonmyplate.in LETSENCRYPT_EMAIL=you@domain.com \
-#     bash deploy/scripts/enable-nginx.sh
-#
-# Staging/development (three hosts):
-#   sudo FRONTEND_DOMAIN=dev.venueonmyplate.com \
-#     ADMIN_DOMAIN=dev-admin.venueonmyplate.com \
-#     API_DOMAIN=dev.api.venueonmyplate.com \
-#     LETSENCRYPT_EMAIL=you@domain.com \
+#   sudo ALLOW_NGINX_INSTALL=1 DOMAIN=venueonmyplate.in LETSENCRYPT_EMAIL=you@domain.com \
 #     bash deploy/scripts/enable-nginx.sh
 set -euo pipefail
+
+if [[ "${ALLOW_NGINX_INSTALL:-0}" != "1" ]]; then
+  echo "Refusing to modify Nginx. Set ALLOW_NGINX_INSTALL=1 only after DNS and Nginx backups are ready." >&2
+  exit 1
+fi
 
 if [[ "${EUID}" -ne 0 ]]; then
   echo "Run as root." >&2

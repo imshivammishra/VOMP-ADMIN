@@ -3,25 +3,34 @@
 ## Runtime topology
 
 ```text
+Current initial deployment (plain HTTP, direct ports)
 Browser
-  │
-  ├─ https://dev.venueonmyplate.com ────── Nginx ── Next website  :3000
-  │                                           ├── /uploads/* ── shared uploads
-  │                                           └── /api/* ────── Express :8081
-  │
-  ├─ https://dev-admin.venueonmyplate.com ─ Nginx ── Next admin   :3002
-  │                                           ├── /uploads/* ── shared uploads
-  │                                           └── /api/* ────── Express :8081
-  │
-  └─ https://dev.api.venueonmyplate.com ── Nginx ── Express API   :8081
+  ├─ http://94.136.188.197:3100 ── Next website (VOMP-MAIN)
+  │        ├── /api/* ────────── Express API (VOMP-API) 127.0.0.1:3101
+  │        └── /uploads/* ────── shared uploads
+  └─ http://94.136.188.197:3102 ── Next admin (VOMP-ADMIN)
+           ├── /api/* ────────── Express API (VOMP-API) 127.0.0.1:3101
+           └── /uploads/* ────── shared uploads
 ```
 
-The API listens only on loopback; Nginx proxies every public hostname. Both Next
+Future HTTPS profile once DNS and certificates are ready:
+
+```text
+Browser
+  ├─ https://venueonmyplate.in ───── Nginx ── Next website  :3100
+  │                                  ├── /uploads/* ── shared uploads
+  │                                  └── /api/* ────── Express :3101
+  └─ https://admin.venueonmyplate.in Nginx ── Next admin   :3102
+                                     ├── /uploads/* ── shared uploads
+                                     └── /api/* ────── Express :3101
+```
+
+The API listens only on loopback. In the current direct-port profile, the Next
+servers proxy `/api` and `/uploads`; UFW must restrict the admin port. After
+HTTPS is enabled, Nginx becomes the only public entry point. Both Next
 applications use same-origin `/api` paths, so admin session cookies are
 first-party. The API still validates `Origin`/`Host` for writes and applies CORS
-for the website/admin origins. The production profile uses
-`venueonmyplate.in` and `admin.venueonmyplate.in` with the same same-origin API
-strategy and no public API hostname.
+for the website/admin origins.
 
 ## Monorepo boundaries
 

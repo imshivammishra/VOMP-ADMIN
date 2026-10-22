@@ -4,25 +4,30 @@ Production monorepo for the private side of **Venue On My Plate**: the public
 content API, the operations console and one SQL database. The customer website
 lives in the separate [`VENUEONMYPLATE`](../VENUEONMYPLATE) repository.
 
-| Service | Local URL | Development / staging | Production |
+| Service | Local URL | Current VPS | Future HTTPS |
 | --- | --- | --- | --- |
-| Public website | <http://localhost:3001> | <https://dev.venueonmyplate.com> | <https://venueonmyplate.in> |
-| Admin console | <http://localhost:3002> | <https://dev-admin.venueonmyplate.com> | <https://admin.venueonmyplate.in> |
-| API | <http://localhost:8081> | <https://dev.api.venueonmyplate.com> | private behind Nginx |
+| Public website | <http://localhost:3100> | <http://94.136.188.197:3100> | <https://venueonmyplate.in> |
+| Admin console | <http://localhost:3102> | <http://94.136.188.197:3102> (restricted) | <https://admin.venueonmyplate.in> |
+| API | <http://localhost:3101> | private `127.0.0.1:3101` | private behind Nginx |
 
 ## Architecture
 
 ```text
+Current direct-port deployment (plain HTTP)
 Internet
-   │
-   ├── dev.venueonmyplate.com        → Nginx → Next website   127.0.0.1:3000
-   ├── dev-admin.venueonmyplate.com  → Nginx → Next admin     127.0.0.1:3002
-   └── dev.api.venueonmyplate.com    → Nginx → Express API    127.0.0.1:8081
+   ├── :3100 → Next website (VOMP-MAIN) ──┐
+   │        /api, /uploads ───────────────┼── Express API 127.0.0.1:3101
+   └── :3102 → Next admin  (VOMP-ADMIN) ──┘
+
+Future HTTPS deployment
+Internet
+   ├── venueonmyplate.in       → Nginx → Next website 127.0.0.1:3100
+   └── admin.venueonmyplate.in → Nginx → Next admin   127.0.0.1:3102
 
 The website/admin call /api on their own origin, so the admin session cookie
 stays first-party. /uploads is served from shared media storage.
-API/admin/website are separate processes. Nginx is the only public entry point.
-Database: SQLite in WAL mode, stored outside both repositories on the VPS.
+API/admin/website are separate PM2 processes. Database: SQLite in WAL mode,
+stored outside both repositories under /opt/vomp-deploy/shared.
 ```
 
 ## Repository structure
@@ -71,15 +76,17 @@ npm run seed
 npm run dev
 ```
 
-`npm run dev` starts the API on **8081** and the admin console on **3002**.
+`npm run dev` starts the API on **3101** and the admin console on **3102**.
 
 Start the public website separately from its repository:
 
 ```bash
 cd ../VENUEONMYPLATE
 npm ci
-npm run dev -- -p 3001
+npm run dev
 ```
+
+The website dev server runs on **3100** and proxies `/api` to the API.
 
 ### Root commands
 
@@ -116,7 +123,7 @@ CSRF checks and login rate limiting.
 | `deploy/env/*.example` | Production templates copied to `shared/env/` |
 
 Never commit `.env` files. Production secrets live in
-`/var/www/vomp/shared/env/` with mode `600`.
+`/opt/vomp-deploy/shared/env/` with mode `600`.
 
 The admin and website both call `/api` on their own origin, so the session
 remains first-party. Next.js proxies that path to the private API in local
@@ -127,8 +134,8 @@ loopback only.
 
 - Local database: `apps/api/data/vomp.sqlite`
 - Local uploads: `apps/api/uploads/library/`
-- Production database: `/var/www/vomp/shared/data/vomp.sqlite`
-- Production uploads: `/var/www/vomp/shared/uploads/library/`
+- Production database: `/opt/vomp-deploy/shared/data/vomp.sqlite`
+- Production uploads: `/opt/vomp-deploy/shared/uploads/library/`
 - Images: up to 8 MB. Videos: up to 80 MB. Admin Nginx accepts 100 MB bodies.
 - The seed intentionally ships **no venue records**. Add real properties in the
   admin console; the public directory only lists published, real venues.
@@ -182,16 +189,18 @@ smoke test, admin lint/type-check/build, and website lint/type-check/build.
 
 ## Deployment
 
-Full Contabo/VPS instructions: [`deploy/README.md`](deploy/README.md).
+Full Contabo/VPS instructions: [`deploy/README.md`](deploy/README.md) and the
+beginner-friendly [`deploy/VOMP-DEPLOYMENT-GUIDE.md`](deploy/VOMP-DEPLOYMENT-GUIDE.md).
 
 ```text
-/var/www/vomp/
-├── website/          # VENUEONMYPLATE clone
-├── workspace/        # this repository
+/opt/vomp-deploy/
+├── main-website/     # VENUEONMYPLATE clone
+├── admin-backend/    # this repository
 └── shared/           # database, uploads, backups, logs, env
 ```
 
-No Vercel dependency. Nginx, PM2 and Let's Encrypt run on the VPS.
+No Vercel dependency. PM2 runs all three services. Nginx + Let's Encrypt are
+the next step for HTTPS; the existing Nginx sites on the VPS must stay intact.
 
 ## Documentation
 

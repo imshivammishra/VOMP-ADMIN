@@ -1,6 +1,12 @@
 import type { NextConfig } from "next";
 
-const apiInternal = (process.env.API_INTERNAL_URL || "http://localhost:8081").replace(/\/+$/, "");
+const apiInternal = (process.env.API_INTERNAL_URL || "http://localhost:3101").replace(/\/+$/, "");
+
+// `upgrade-insecure-requests` rewrites every HTTP subresource to HTTPS. That
+// breaks CSS, JS and images when the console is opened directly over HTTP
+// (for example http://<server-ip>:3102). Opt in only when TLS is enabled.
+const upgradeInsecureRequests =
+  process.env.CSP_UPGRADE_INSECURE_REQUESTS === "1" ? ["upgrade-insecure-requests"] : [];
 
 const contentSecurityPolicy = [
   "default-src 'self'",
@@ -15,7 +21,7 @@ const contentSecurityPolicy = [
   "media-src 'self' https:",
   "connect-src 'self' https:",
   "frame-src 'none'",
-  "upgrade-insecure-requests",
+  ...upgradeInsecureRequests,
 ].join("; ");
 
 const securityHeaders = [

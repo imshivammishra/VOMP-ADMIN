@@ -1,6 +1,9 @@
 export const API_BASE = (() => {
-  const configured = process.env.NEXT_PUBLIC_API_URL;
-  const raw = configured ?? (process.env.NODE_ENV === "production" ? "" : "http://localhost:8081");
+  const configured = process.env.NEXT_PUBLIC_API_URL?.trim();
+  // Older builds used /api-backend, which the API does not expose. Treat it as
+  // the same-origin root so requests still reach /api/... through Next/Nginx.
+  const normalized = configured === "/api-backend" ? "" : configured;
+  const raw = normalized ?? (process.env.NODE_ENV === "production" ? "" : "http://localhost:3101");
   return raw.replace(/\/+$/, "");
 })();
 

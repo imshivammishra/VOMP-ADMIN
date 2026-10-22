@@ -1,6 +1,18 @@
 #!/usr/bin/env bash
-# One-time Contabo VPS preparation (Ubuntu 22.04 / 24.04, run as root).
+# LEGACY / DISABLED BY DEFAULT.
+# This script targets the old /var/www/vomp + "vomp" application-user layout.
+# The current server uses /opt/vomp-deploy and the adarsharma user, with Node
+# installed through nvm. Running this script on the existing VPS would create
+# users/directories that do not match production.
+#
+# Current setup is documented in deploy/VOMP-DEPLOYMENT-GUIDE.md. To run this
+# legacy script intentionally on a blank host: ALLOW_LEGACY_BOOTSTRAP=1 sudo -E bash ...
 set -euo pipefail
+
+if [[ "${ALLOW_LEGACY_BOOTSTRAP:-0}" != "1" ]]; then
+  echo "Refusing to run the legacy bootstrap. Set ALLOW_LEGACY_BOOTSTRAP=1 only on a blank host." >&2
+  exit 1
+fi
 
 if [[ "${EUID}" -ne 0 ]]; then
   echo "Run this script as root: sudo bash deploy/scripts/bootstrap-contabo.sh"

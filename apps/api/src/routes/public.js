@@ -208,7 +208,7 @@ publicRouter.post(
   })
 );
 
-// ── Legacy bridge used by the live public website on :3000 ────────────────
+// ── Legacy bridge used by older public website builds ─────────────────────
 export const legacyRouter = Router();
 
 legacyRouter.post(
