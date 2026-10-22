@@ -19,7 +19,7 @@
     "test": "npm run check --workspace @vomp/api && npm run smoke --workspace @vomp/api"
   },
   "devDependencies": {
-    "concurrently": "^9.1.2"
+    "concurrently": "^10.0.6"
   },
   "engines": {
     "node": ">=22.5.0",
