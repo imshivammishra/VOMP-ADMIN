@@ -57,7 +57,7 @@ export const contentBlocks = [
   slide("slide-3", "Shortlist in a day", "Your dream shortlist, in one day flat.", "Share your city, date, guest count and mood. Receive a bespoke shortlist with private quote-led options in one business day.", "/images/wedding-decor.jpg", "White draped wedding mandap with crystal chandelier", "How it works", "#how-it-works", "Talk to an expert", "/contact"),
 
   // ── Ticker ─────────────────────────────────────────────────────────────
-  ...["Udaipur", "Jaipur", "Goa", "Delhi NCR", "Mumbai", "Weddings", "Sangeet", "Haldi", "Receptions", "Corporate"].map((title) => ({
+  ...["Mehendi", "Haldi", "Sangeet", "Saat Pheras", "Reception", "Padharo Sa", "Udaipur", "Jaipur", "Jodhpur", "Goa"].map((title) => ({
     section: "ticker",
     title,
     subtitle: "",
@@ -144,7 +144,7 @@ export const contentBlocks = [
     section: "seo",
     blockKey: "home-seo",
     title: "Finding wedding and party venues in India, without the legwork.",
-    body: "Venue On My Plate helps you discover venues for weddings, receptions, birthdays, corporate events and private celebrations across India — from heritage palaces in Udaipur and garden resorts in Jaipur to beach venues in Goa and banquet estates in Delhi NCR.\n\nWe focus only on venues — not decor, catering, or photography. Our team helps you compare venue flow, ceremony zones, guest movement, rooms and private quote options, so haldi mornings, sangeet evenings and the wedding day itself start from the right venue choice.\n\nStart by browsing all venues or pick a destination such as Udaipur, Jaipur or Goa. Want ideas first? The journal covers costs, seasonality and visit checklists.",
+    body: "Venue On My Plate helps you discover venues for weddings, receptions, birthdays, corporate events and private celebrations across India — from heritage palaces in Udaipur and garden resorts in Jaipur to desert forts in Jaisalmer, palace courtyards in Jodhpur and beach venues in Goa.\n\nWe focus only on venues — not decor, catering, or photography. Our team helps you compare venue flow, ceremony zones, guest movement, rooms and private quote options, so haldi mornings, sangeet evenings and the wedding day itself start from the right venue choice.\n\nStart by browsing all venues or pick a destination such as Udaipur, Jaipur, Jodhpur or Goa. Want ideas first? The journal covers costs, seasonality and visit checklists.",
     meta: {},
   },
 
