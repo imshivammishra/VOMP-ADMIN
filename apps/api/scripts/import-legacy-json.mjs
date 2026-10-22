@@ -57,6 +57,16 @@ const arrayOf = (value) => {
 
 const unique = (values, limit = 40) => [...new Set(values.map(clean).filter(Boolean))].slice(0, limit);
 
+const cityAliases = new Map([
+  ["jim corbett", "Jim Corbett"],
+  ["jhujhunu", "Jhunjhunu"],
+]);
+
+const normalizeCity = (value) => {
+  const city = clean(value);
+  return cityAliases.get(city.toLowerCase()) || city;
+};
+
 const slugify = (value) =>
   clean(value)
     .toLowerCase()
@@ -149,7 +159,7 @@ for (const venue of venues) {
     const image = clean(venue.cover_image_url) || arrayOf(venue.gallery_image_urls)[0] || "";
     const statusRaw = clean(venue.status).toLowerCase();
     const status = ["published", "draft", "archived"].includes(statusRaw) ? statusRaw : "draft";
-    const city = clean(venue.city) || "India";
+    const city = normalizeCity(venue.city) || "India";
     const area = truncate(venue.locality || venue.address_line, 160);
     const createdAt = iso(venue.created_at);
     const updatedAt = iso(venue.updated_at, createdAt);
