@@ -1,11 +1,12 @@
 # Contabo deployment (current server)
 
-> **Current phase: all three code services, fresh empty SQLite.** The website,
-> admin console and API run on `3100`/`3102`/`3101`. The SQLite database is
-> freshly seeded and contains **no real venues yet**, so the public website
-> renders its built-in fallback catalogue. The real content remains in the
-> separate legacy Docker Postgres stack (642 venues, 232 published; 6,338 media
-> records; 20 enquiries) and must not be deleted or migrated without approval.
+> **Current phase: all three services live with the imported production catalogue.**
+> The website, admin console and API run on `3100`/`3102`/`3101`. The SQLite
+> database contains **642 venues** (232 published, 404 draft, 6 archived),
+> **6,185 imported media records**, **20 enquiries** and **16 settings**. The
+> public website serves this real catalogue, including 232 published venue pages.
+> The legacy Docker Postgres stack remains running and untouched; its full backup
+> is in `/opt/vomp-deploy/shared/backups/legacy-postgres-20261022-051058.sql.gz`.
 > Admin `3102` is exposed over plain HTTP by explicit approval; restrict it to a
 > known IP or add HTTPS as soon as possible.
 
@@ -19,7 +20,7 @@ commits is obsolete; do not run the legacy bootstrap script on this machine.
 | --- | --- | --- | --- |
 | Public website (VOMP-MAIN) | `/opt/vomp-deploy/main-website` | `3100` | Public |
 | API (VOMP-API) | `/opt/vomp-deploy/admin-backend/apps/api` | `3101` | Loopback only |
-| Admin console (VOMP-ADMIN) | `/opt/vomp-deploy/admin-backend/apps/admin` | `3102` | Restricted / direct |
+| Admin console (VOMP-ADMIN) | `/opt/vomp-deploy/admin-backend/apps/admin` | `3102` | Public temporarily (HTTP; UFW open) |
 | SQLite database | `/opt/vomp-deploy/shared/data/vomp.sqlite` | — | Disk |
 | Uploads | `/opt/vomp-deploy/shared/uploads` | — | Disk |
 | Env files | `/opt/vomp-deploy/shared/env` | — | Mode `600` |
@@ -51,6 +52,9 @@ EXTRA_CORS_ORIGINS=http://127.0.0.1:3100,http://127.0.0.1:3102 \
 bash deploy/scripts/init-env.sh
 
 # Register PM2 at boot (run the sudo command that pm2 prints).
+# PM2 7 may generate a Type=forking unit that fails with "protocol" because
+# it does not create the declared PID file. The current VPS uses the tested
+# Type=oneshot unit described in the PM2 section below.
 pm2 startup systemd -u adarsharma --hp /home/adarsharma
 
 # Build and start everything.
@@ -61,6 +65,40 @@ pm2 save
 The initial admin credentials are written to
 `/opt/vomp-deploy/shared/env/initial-admin.txt` (mode `600`). Change the password
 after the first login and delete that file.
+
+## Data migration (completed 2026-10-22)
+
+The real catalogue was exported from the legacy Docker Postgres stack and
+imported into the persistent SQLite database. The legacy stack was not modified
+and still runs in parallel.
+
+Source material and safety copies:
+
+```text
+/opt/vomp-deploy/shared/backups/legacy-export/
+  venues.json, media.json, enquiries.json, settings.json
+/opt/vomp-deploy/shared/backups/legacy-postgres-20261022-051058.sql.gz
+/opt/vomp-deploy/shared/backups/vomp-before-legacy-import-20261022-052240.sqlite
+```
+
+Repeatable import command (Node 22; do **not** run while the API is writing, and
+back up the SQLite database first):
+
+```bash
+cd /opt/vomp-deploy/admin-backend
+DB_PATH=/opt/vomp-deploy/shared/data/vomp.sqlite \
+EXPORT_DIR=/opt/vomp-deploy/shared/backups/legacy-export \
+node apps/api/scripts/import-legacy-json.mjs
+```
+
+The script is idempotent by legacy ID, but it updates matching rows. Re-running
+it can overwrite later edits to imported venues, enquiries and media, so treat it
+as a one-time migration or a deliberate restore-from-legacy operation, not a
+normal deploy step.
+
+Imported media keeps its public S3 URLs
+(`https://vomp-media.s3.ap-south-1.amazonaws.com/...`). New admin uploads are
+stored under `/opt/vomp-deploy/shared/uploads/` and served through `/uploads/`.
 
 ## Deploying a normal update
 
@@ -145,6 +183,33 @@ pm2 save
 Do not use broad `pkill -f next` commands; other Node projects (portfolio and
 legacy Docker services) run on the same VPS.
 
+### Boot unit for PM2 7
+
+The standard `pm2 startup` unit uses `Type=forking` with a `PIDFile`. On this VPS
+that unit failed with `Result: protocol` because PM2 7 did not create the PID
+file, so the current `/etc/systemd/system/pm2-adarsharma.service` is a tested
+`Type=oneshot` unit with `RemainAfterExit=yes`, no `PIDFile`, and `ExecStop=pm2
+kill`. The maintained template is `deploy/pm2/pm2-adarsharma.service`; the
+pre-change unit is backed up in
+`/opt/vomp-deploy/shared/backups/pm2-adarsharma.service.bak-*`.
+
+Check the current unit and restart path:
+
+```bash
+systemctl cat pm2-adarsharma
+sudo systemctl restart pm2-adarsharma
+sleep 10
+systemctl is-active pm2-adarsharma
+pm2 status
+curl -fsS http://127.0.0.1:3101/api/health
+curl -fsS -o /dev/null -w '%{http_code}\n' http://127.0.0.1:3100/healthz
+```
+
+A restart of this unit kills and resurrects the saved PM2 process list. It does
+not stop the legacy Docker stack or the other `/var/www` projects. A full
+`sudo reboot` affects every project on the server and still requires explicit
+approval; the unit restart above is the normal boot-path test.
+
 ## Backups
 
 ```bash
@@ -199,8 +264,9 @@ The server currently runs Nginx for `adarsharma.com` only. Do **not** remove the
 existing Nginx sites or the default site. The `deploy/nginx/*.conf` files are
 templates for a future domain-based HTTPS setup; they are not installed by the
 deployment scripts. Complete DNS first, take an Nginx backup, then add a
-separate `vomp` site and obtain certificates with Certbot. Until then, keep the
-admin port restricted in UFW.
+separate `vomp` site and obtain certificates with Certbot. The admin port is
+currently open in UFW only because of an explicit temporary approval; restore an
+IP restriction as soon as the browser testing window ends.
 
 ## Troubleshooting
 
@@ -210,5 +276,7 @@ admin port restricted in UFW.
 | API 404 on website | `curl http://127.0.0.1:3101/api/health`; check `API_INTERNAL_URL` and `next.config.ts` rewrites. |
 | Admin login bounces | `COOKIE_SECURE=false` for HTTP; API healthy; correct admin URL/port `3102`. |
 | Admin on wrong port | Check `pm2 describe VOMP-ADMIN`; the start command must use `-p 3102`. |
-| Database missing | `ls -l /opt/vomp-deploy/shared/data/`; `pm2 logs VOMP-API`; API creates the DB and seeds on first start. |
-| PM2 gone after reboot | `systemctl status pm2-adarsharma`; run `pm2 save` after changes. |
+| Database missing | `ls -l /opt/vomp-deploy/shared/data/`; `pm2 logs VOMP-API`; API creates and seeds an empty DB. Restore a known backup rather than re-importing over edited production data. |
+| Website shows the empty/old catalogue | Check `curl http://127.0.0.1:3101/api/v1/public/venues` returns 232; rebuild the website; the client requests `?limit=500`; only clear `.next/cache` if a stale build cache is suspected. |
+| API or website build returns 429 | The API read ceiling is 6000/min and the 120/min write limiter applies only to non-GET methods. Restart `VOMP-API` to clear in-memory buckets; do not lower these without accounting for SSR/build traffic. |
+| PM2 gone after reboot | `systemctl status pm2-adarsharma`; run `pm2 save` after changes. If the unit failed with `Result: protocol`, use the `Type=oneshot` unit described in the PM2 section. |

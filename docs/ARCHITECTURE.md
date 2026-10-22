@@ -64,8 +64,9 @@ src/server.js
   realtime broadcast, activity logging and media handling.
 - `src/routes` contains one router per domain.
 - `src/schema.sql` is the idempotent schema baseline.
-- `seed/` creates the first admin and real catalogue/CMS content only when a
-  record is absent. Seed operations are safe to rerun.
+- `seed/` creates the first admin and starter CMS content only when a record is
+  absent. Seed operations are safe to rerun. The production venue catalogue was
+  imported from the legacy Postgres export; it is not part of the seed.
 
 ## Admin console
 
@@ -97,7 +98,9 @@ No demo data or mock authentication exists in the console.
 ## Security model
 
 - scrypt password hashes, database-backed sessions, revocable per device.
-- HttpOnly, Secure, SameSite=Lax, host-only cookies in production.
+- HttpOnly, SameSite=Lax, host-only cookies; `Secure` is enabled together with
+  HTTPS (`COOKIE_SECURE=true`). The current plain-HTTP phase necessarily uses
+  `COOKIE_SECURE=false`.
 - CSRF origin/custom-header checks on all authenticated writes.
 - Login and public endpoint rate limits; generic authentication errors.
 - Strict CORS allow-list; API never publicly bound.

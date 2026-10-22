@@ -4,17 +4,18 @@ Beginner-friendly runbook for the current Contabo VPS (`94.136.188.197`).
 It covers the public website, the API and the admin console, plus the checks
 labelled **A–I** used before calling a deployment complete.
 
-> **Current phase:** all three code services run on `3100` (website), `3102`
-> (admin) and `3101` (private API). The SQLite database is freshly seeded and
-> contains **no real venues yet**; the public website shows its built-in
-> fallback catalogue. The real production content remains in the separate
-> legacy Docker Postgres stack (642 venues, 232 published; 6,338 media records;
-> 20 enquiries) and is untouched. Do not migrate or delete it without approval.
+> **Current phase:** all three services run live on `3100` (website), `3102`
+> (admin) and `3101` (private API). The SQLite database contains the migrated
+> production catalogue: **642 venues** (232 published, 404 draft, 6 archived),
+> **6,185 imported media records**, **20 enquiries** and **16 settings**. The
+> public website serves 232 published venue pages from this data. The separate
+> legacy Docker Postgres stack remains running and untouched as a safety copy.
 >
 > **Current state:** plain HTTP on direct IP ports. Admin `3102` is exposed
-> publicly by explicit approval, which sends the login password over HTTP.
-> Restrict it to a known IP or add HTTPS as soon as possible. Domain, TLS, data
-> migration and GitHub Actions secrets are still separate setup steps.
+> publicly by explicit temporary approval, which sends the login password over
+> HTTP. Restrict it to a known IP or add HTTPS as soon as possible. Domain, TLS
+> and GitHub Actions secrets are still separate setup steps. A full reboot has
+> not been performed; the PM2 systemd restart path has been verified.
 
 ---
 
@@ -24,7 +25,7 @@ labelled **A–I** used before calling a deployment complete.
 | --- | --- | --- | --- | --- |
 | Public website | `VOMP-MAIN` | `/opt/vomp-deploy/main-website` | `3100` | Internet |
 | API | `VOMP-API` | `/opt/vomp-deploy/admin-backend/apps/api` | `3101` | `127.0.0.1` only |
-| Admin console | `VOMP-ADMIN` | `/opt/vomp-deploy/admin-backend/apps/admin` | `3102` | Restricted IP or SSH tunnel |
+| Admin console | `VOMP-ADMIN` | `/opt/vomp-deploy/admin-backend/apps/admin` | `3102` | Internet temporarily (HTTP); restrict after testing |
 
 Persistent files:
 
@@ -114,6 +115,53 @@ pm2 save
 
 The systemd unit is named `pm2-adarsharma`.
 
+> **PM2 7 boot-unit fix (already applied):** the generated unit used
+> `Type=forking` plus a `PIDFile`, but PM2 7 did not create that file and systemd
+> failed with `Result: protocol`. The current unit uses `Type=oneshot` and
+> `RemainAfterExit=yes`, removes `PIDFile` and `Restart`, and keeps
+> `ExecStart=... pm2 resurrect` / `ExecStop=... pm2 kill`. The template is in
+> `deploy/pm2/pm2-adarsharma.service`; the old unit is backed up in
+> `/opt/vomp-deploy/shared/backups/pm2-adarsharma.service.bak-*`. Do not
+> overwrite the working unit with a freshly generated one without testing a
+> restart.
+
+### 2.1 Production data migration (completed 2026-10-22)
+
+The legacy catalogue was exported as JSON and imported into SQLite. The source
+stack was not changed. Current result:
+
+| Table | Count |
+| --- | --- |
+| Venues total | 642 |
+| Published / draft / archived | 232 / 404 / 6 |
+| Media (READY records imported) | 6,185 |
+| Enquiries | 20 |
+| Settings | 16 |
+
+Safety copies:
+
+```text
+/opt/vomp-deploy/shared/backups/legacy-export/
+  venues.json, media.json, enquiries.json, settings.json
+/opt/vomp-deploy/shared/backups/legacy-postgres-20261022-051058.sql.gz
+/opt/vomp-deploy/shared/backups/vomp-before-legacy-import-20261022-052240.sqlite
+```
+
+The repeatable import command is:
+
+```bash
+cd /opt/vomp-deploy/admin-backend
+DB_PATH=/opt/vomp-deploy/shared/data/vomp.sqlite \
+EXPORT_DIR=/opt/vomp-deploy/shared/backups/legacy-export \
+node apps/api/scripts/import-legacy-json.mjs
+```
+
+It updates by legacy ID, so it is idempotent, but it will overwrite later edits
+to imported records. Take a fresh SQLite backup and treat it as a deliberate
+restore-from-legacy operation, not a normal deploy step. Imported images remain
+on the public S3 bucket; new uploads live under `shared/uploads/` and are served
+through `/uploads/`.
+
 ---
 
 ## 3. Deploy an update
@@ -129,8 +177,10 @@ git pull --ff-only
 bash deploy/scripts/deploy.sh
 ```
 
-This deploys API, admin and website together and runs checks A–I. The API uses
-the fresh SQLite database; it does **not** import the legacy Postgres data.
+This deploys API, admin and website together and runs checks A–I. It uses the
+persistent SQLite database and **never** runs the legacy import as part of a
+deploy. Imported data survives deploys; the scripts only build, reload and run
+read-only checks.
 
 ### Website-only release (optional)
 
@@ -207,6 +257,19 @@ Expected:
   `ps -eo user,pid,args | grep -E 'next-server|next start' | grep -v grep`.
 - Do not use `pkill -f next`; it can kill the portfolio or another project.
 
+Current production data sanity check:
+
+```bash
+sqlite3 /opt/vomp-deploy/shared/data/vomp.sqlite \
+  "SELECT 'venues', COUNT(*) FROM venues;
+   SELECT 'published', COUNT(*) FROM venues WHERE status='published';
+   SELECT 'media', COUNT(*) FROM media;
+   SELECT 'enquiries', COUNT(*) FROM enquiries;"
+```
+
+Expected: `642`, `232`, `6185`, `20`. A zero or a much smaller number means the
+API is pointing at the wrong database or the import/restore was not completed.
+
 ### C. Public website loads styled assets over HTTP
 
 ```bash
@@ -235,6 +298,8 @@ If the CSS link is present but the browser requests it over HTTPS, see
 curl -sS http://127.0.0.1:3101/api/health
 curl -sS http://127.0.0.1:3100/api/health
 curl -sS http://127.0.0.1:3100/api/v1/public/venues | head -c 500; echo
+curl -sS http://127.0.0.1:3100/api/v1/public/venues |
+  node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const j=JSON.parse(s);console.log('public venues:',(j.data||j).length)})"
 ss -ltnp | grep ':3101'
 ```
 
@@ -243,7 +308,8 @@ Expected:
 - API health JSON contains `"ok":true`, `"service":"vomp-api"` and
   `"database":"ok"`.
 - The same health endpoint works through the website's `/api` proxy.
-- Public venues return JSON, not a 404 HTML page.
+- Public venues return JSON, not a 404 HTML page, and the printed count is
+  **232**.
 - `3101` is bound to loopback. It must not be reachable from another machine;
   test externally only if you expect it to fail:
   `curl --max-time 5 http://94.136.188.197:3101/api/health` should fail.
@@ -258,7 +324,9 @@ curl -sS -o /dev/null -w '%{http_code}\n' http://127.0.0.1:3102/api/admin/overvi
 
 Expected: `200`, `200`, **`401`**.
 
-In a browser (from an allowed IP or through an SSH tunnel):
+While the temporary public exposure is approved, open
+`http://94.136.188.197:3102/login`. After the approval ends, use an SSH tunnel
+instead:
 
 ```bash
 ssh -L 3102:127.0.0.1:3102 adarsharma@94.136.188.197
@@ -275,8 +343,9 @@ you set later). Expected: the dashboard loads, the browser stores the
 
 ### F. Authenticated data flow works
 
-Use the admin UI for this check. Prefer a **clearly labelled test record**, not a
-real venue, enquiry or article.
+Use the admin UI for this check. Prefer a **clearly labelled test record**, never
+a real venue, enquiry or article. The current baseline is **642 venues** (232
+published) and **20 enquiries**.
 
 1. Sign in to the admin.
 2. Create a venue named `Deployment Check YYYY-MM-DD`, status **published**.
@@ -284,21 +353,27 @@ real venue, enquiry or article.
 4. Verify it through the public API:
 
    ```bash
-   curl -sS http://127.0.0.1:3100/api/v1/public/venues | grep -o 'Deployment Check[^"]*'
+   curl -sS 'http://127.0.0.1:3100/api/v1/public/venues?limit=500' | grep -o 'Deployment Check[^"]*'
    ```
 
 5. Open the public website and confirm the venue appears after the normal
    60-second revalidation window.
 6. Delete the test venue in the admin and verify it disappears from the API.
-7. Confirm the database is on the persistent path:
+7. Confirm the database is on the persistent path and the counts returned to the
+   baseline:
 
    ```bash
    ls -lh /opt/vomp-deploy/shared/data/vomp.sqlite*
-   sqlite3 /opt/vomp-deploy/shared/data/vomp.sqlite "SELECT COUNT(*) FROM venues;"
+   sqlite3 /opt/vomp-deploy/shared/data/vomp.sqlite \
+     "SELECT 'venues', COUNT(*) FROM venues;
+      SELECT 'published', COUNT(*) FROM venues WHERE status='published';
+      SELECT 'enquiries', COUNT(*) FROM enquiries;"
    ```
 
-If the count changes by exactly one and returns to the original value after
-deletion, the admin → API → SQLite → public API path is working.
+If the counts change by exactly one and return to `642` / `232` / `20` after
+deletion, the admin → API → SQLite → public API path is working. A test enquiry
+submitted through the public form is an equally valid end-to-end check; delete it
+in the admin afterwards.
 
 For an upload check, upload a small test image in the admin media screen, confirm
 a new file under `/opt/vomp-deploy/shared/uploads/library/`, open its public
@@ -318,8 +393,9 @@ sqlite3 /opt/vomp-deploy/shared/data/vomp.sqlite \
   "SELECT COUNT(*) AS venues FROM venues; SELECT COUNT(*) AS enquiries FROM enquiries;"
 ```
 
-Expected: the API returns healthy and the counts are unchanged. Uploaded files
-must still exist under `shared/uploads/` and still be served.
+Expected: the API returns healthy and the counts are unchanged at **642 venues**
+and **20 enquiries**. Uploaded files must still exist under `shared/uploads/` and
+still be served.
 
 ### H. Services survive PM2/systemd startup
 
@@ -336,20 +412,28 @@ curl -sS http://127.0.0.1:3101/api/health
 
 Expected:
 
-- `pm2-adarsharma` is `enabled`.
-- After restarting the PM2 systemd unit, all three VOMP processes come back.
+- `pm2-adarsharma` is `enabled` and `active`.
+- After restarting the PM2 systemd unit, all three VOMP processes come back with
+  new PIDs and the health checks stay green.
 - No unrelated Docker containers or `/var/www` services were restarted by this
   command.
 
-A full `sudo reboot` affects every project on the VPS. Schedule it only with
-approval. The PM2 unit and `pm2 save` are what make the VOMP apps return after a
-reboot.
+If the unit fails with `Result: protocol`, PM2 7 did not create the declared
+`PIDFile`. Use the tested `Type=oneshot` / `RemainAfterExit=yes` unit described
+in section 2 and remove `PIDFile`/`Restart`. A full `sudo reboot` affects every
+project on the VPS. Schedule it only with approval. The PM2 unit and `pm2 save`
+are what make the VOMP apps return after a reboot.
 
 ### I. CI/CD is configured and verified
 
-Both repositories have `.github/workflows/ci.yml` and
-`.github/workflows/deploy.yml`. CI runs lint, type-check, tests and builds.
-Deploy runs only on `main` after verify passes.
+Both repositories have CI and a `deploy.yml` workflow. CI runs lint, type-check,
+tests and builds. Deploy runs only on `main` after verify passes, and both can be
+started manually with `workflow_dispatch`.
+
+**Current status:** the VPS deployment was performed manually. The GitHub
+Actions secrets are **not configured** and no real workflow deployment has been
+verified. Do not claim CI/CD is complete until a workflow run has deployed and
+its health checks passed.
 
 Required repository secrets (add the same values to both repos):
 
@@ -421,8 +505,11 @@ Copy `/opt/vomp-deploy/shared/backups/` off the VPS regularly.
 
 ## 5. Security notes for the current HTTP phase
 
-- The admin port must **not** be open to the internet. Use an SSH tunnel, or
-  allow only your current public IP:
+- **Current exception:** `3102` is open to the internet by explicit temporary
+  approval so the admin console can be reviewed over HTTP. This is not the
+  long-term state; the password crosses the network unencrypted. Restore an
+  IP restriction or add HTTPS as soon as the review is done. Use an SSH tunnel,
+  or allow only your current public IP:
 
   ```bash
   sudo ufw allow from YOUR.PUBLIC.IP to any port 3102 proto tcp
@@ -464,8 +551,10 @@ normal deploy scripts.
 | Admin is on port 3002 or 3000 | `pm2 describe VOMP-ADMIN`; the start args must be `start -p 3102 -H 0.0.0.0`; reload PM2. |
 | Admin login returns to login | `COOKIE_SECURE=false` for HTTP; use the same host (`94.136.188.197:3102` or tunnel `127.0.0.1:3102`); check API `/api/health` through the admin proxy. |
 | API exits at startup | `pm2 logs VOMP-API --lines 100`; `SEED_ADMIN_PASSWORD` must be at least 12 chars and not a placeholder in production. |
-| Database empty / reseeded | Check `DB_PATH` in `api.env`; it must be `/opt/vomp-deploy/shared/data/vomp.sqlite`; check file permissions for `adarsharma`; never point it at a temp path. |
-| PM2 processes gone after reboot | `systemctl status pm2-adarsharma`; run `pm2 save`; ensure the PM2 startup unit is enabled. |
+| Website shows empty or stale catalogue | `curl http://127.0.0.1:3101/api/v1/public/venues` must return 232; rebuild the website; the client requests `?limit=500`; clear `.next/cache` only if a stale build cache is suspected. |
+| API or build returns 429 | Read ceiling is 6000/min; the 120/min write limiter applies only to non-GET methods. Restart `VOMP-API` to clear in-memory buckets; do not lower limits without accounting for SSR/build traffic. |
+| Database empty / reseeded | Check `DB_PATH` in `api.env`; it must be `/opt/vomp-deploy/shared/data/vomp.sqlite`; check file permissions for `adarsharma`; never point it at a temp path. Restore a known backup rather than re-importing over edited data. |
+| PM2 processes gone after reboot | `systemctl status pm2-adarsharma`; run `pm2 save`; ensure the unit is enabled. If it failed with `Result: protocol`, replace the generated `Type=forking` unit with the tested `Type=oneshot` unit. |
 | Deploy workflow fails before SSH | Missing `VPS_*` GitHub secrets; add them and rerun. |
 | Deploy workflow SSH fails | Public key in `/home/adarsharma/.ssh/authorized_keys`; correct `VPS_USER`/`VPS_HOST`; port 22 open; `ssh -i` manually. |
 | `npm ci` fails | Node 22 loaded; disk space (`df -h /`); network access to npm registry. |
@@ -491,13 +580,14 @@ A deployment is complete only when all of these are true:
 
 - [ ] A. Fresh config backup and revision record exist.
 - [ ] B. `VOMP-MAIN`, `VOMP-ADMIN`, `VOMP-API` are online; ports are
-      `3100`, `3102`, and loopback `3101`; no stale 3002 process.
+      `3100`, `3102`, and loopback `3101`; no stale 3002 process; SQLite reports
+      642 venues / 232 published / 6,185 media / 20 enquiries.
 - [ ] C. Website CSS returns `200 text/css`; CSP does not force HTTPS.
-- [ ] D. API health is OK through `3101` and the website proxy; `3101` is not
-      publicly reachable.
+- [ ] D. API health is OK through `3101` and the website proxy; the public venue
+      count is 232; `3101` is not publicly reachable.
 - [ ] E. Admin login works; anonymous admin API returns `401`.
 - [ ] F. A labelled test record reaches SQLite and the public API, then is
-      removed; uploads use shared storage.
+      removed; counts return to baseline; uploads use shared storage.
 - [ ] G. Counts and uploads survive an API restart.
 - [ ] H. PM2 systemd unit is enabled and brings services back after restart.
 - [ ] I. CI passes; deploy workflow succeeds after secrets are configured.

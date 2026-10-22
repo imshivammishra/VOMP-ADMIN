@@ -37,7 +37,8 @@ trees under `/opt/vomp-deploy/shared/`, so deploys never overwrite them.
 - `content_blocks` — homepage sections grouped by `section` + `block_key`, with
   ordering, draft/published status and arbitrary `meta` JSON
 - `reviews` — client reviews, rating, venue link, feature flag, order and status
-- `media` — uploaded image/video metadata and relative `/uploads/...` URL
+- `media` — uploaded image/video metadata and public URL (shared `/uploads/...`
+  or an imported S3 URL)
 - `settings` — site identity, contact details, social links and feature toggles
 
 All tables use `TEXT` ISO-8601 timestamps in UTC and snake_case columns. List
@@ -56,6 +57,27 @@ For a schema change:
 2. Add a safe additive migration guard in `db.js` for existing databases.
 3. Run the seed and smoke test.
 4. Back up production before deploying.
+
+## Legacy catalogue import
+
+Production was migrated once from the legacy Docker Postgres stack into SQLite.
+The current database contains 642 venues (232 published, 404 draft, 6 archived),
+6,185 imported media records, 20 enquiries and 16 settings.
+
+The repeatable importer is `apps/api/scripts/import-legacy-json.mjs`:
+
+```bash
+cd /opt/vomp-deploy/admin-backend
+DB_PATH=/opt/vomp-deploy/shared/data/vomp.sqlite \
+EXPORT_DIR=/opt/vomp-deploy/shared/backups/legacy-export \
+node apps/api/scripts/import-legacy-json.mjs
+```
+
+It uses `INSERT ... ON CONFLICT(id) DO UPDATE`, so it can overwrite later edits
+to imported rows. Take a fresh SQLite backup and treat a rerun as a deliberate
+restore-from-legacy operation. The legacy JSON export and full Postgres backup
+are under `/opt/vomp-deploy/shared/backups/`; the legacy Docker stack remains
+untouched.
 
 ## Backup
 
