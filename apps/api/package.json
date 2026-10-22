@@ -10,7 +10,8 @@
     "seed": "node scripts/seed.js",
     "reset": "node scripts/reset.js",
     "check": "node scripts/check.mjs",
-    "smoke": "node scripts/smoke.mjs"
+    "smoke": "node scripts/smoke.mjs",
+    "import:legacy": "node scripts/import-legacy-json.mjs"
   },
   "dependencies": {
     "compression": "^1.8.0",
