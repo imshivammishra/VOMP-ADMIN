@@ -57,7 +57,7 @@ export const contentBlocks = [
   slide("slide-3", "Shortlist in a day", "Your dream shortlist, in one day flat.", "Share your city, date, guest count and mood. Receive a bespoke shortlist with private quote-led options in one business day.", "/images/wedding-decor.jpg", "White draped wedding mandap with crystal chandelier", "How it works", "#how-it-works", "Talk to an expert", "/contact"),
 
   // ── Ticker ─────────────────────────────────────────────────────────────
-  ...["Mehendi", "Haldi", "Sangeet", "Saat Pheras", "Reception", "Padharo Sa", "Udaipur", "Jaipur", "Jodhpur", "Goa"].map((title) => ({
+  ...["Mehendi", "Haldi", "Sangeet", "Saat Pheras", "Reception", "Baraat", "Udaipur", "Jaipur", "Jodhpur", "Goa"].map((title) => ({
     section: "ticker",
     title,
     subtitle: "",

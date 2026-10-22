@@ -15,7 +15,7 @@ console.log(
   blocks.map((b) => ({ key: b.block_key, title: b.title, order: b.sort_order }))
 );
 
-const ribbon = ["Mehendi", "Haldi", "Sangeet", "Saat Pheras", "Reception", "Padharo Sa"];
+const ribbon = ["Mehendi", "Haldi", "Sangeet", "Saat Pheras", "Reception", "Baraat"];
 for (let i = 0; i < Math.min(blocks.length, ribbon.length); i += 1) {
   await db.collection("content_blocks").updateOne(
     { _id: blocks[i]._id },
